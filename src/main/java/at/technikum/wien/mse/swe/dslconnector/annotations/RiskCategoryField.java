@@ -5,13 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
-// @Number(position = 3, length = 4, padding =' ', align = LEFT
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface NumberFloat {
+public @interface RiskCategoryField {
     int position();
-    int length();
-    char padding();
-    AlignmentEnum align();
+    int length() default 2;
+    AlignmentEnum align() default AlignmentEnum.LEFT;
 }

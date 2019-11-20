@@ -5,13 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
-// @String(position = 3, length = 4, padding =' ', align = LEFT
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface String {
+public @interface BigDecimalField {
     int position();
     int length();
-    char padding();
-    AlignmentEnum align();
+    char padding() default '0';
+    AlignmentEnum align() default AlignmentEnum.RIGHT;
 }

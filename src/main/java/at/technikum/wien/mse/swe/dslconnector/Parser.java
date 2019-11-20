@@ -1,10 +1,25 @@
 package at.technikum.wien.mse.swe.dslconnector;
 
-import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
+import at.technikum.wien.mse.swe.dslconnector.annotations.*;
+import at.technikum.wien.mse.swe.model.SecurityAccountOverview;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Parser {
 
     private final static String PACKAGE_NAME = "at.technikum.wien.mse.swe";
+
+    private Map<String, Class> mapping = new HashMap<>();
+
+    void initMapping() {
+        mapping.put("StringField", StringParser.class);
+        mapping.put("BigDecimalField", BigDecimalParser.class);
+    }
 
     void parse() throws FieldParserException {
 //        try {
@@ -17,8 +32,65 @@ public class Parser {
 //        }
 
 
-        final String source = "SecurityAccountOverview                 012345678900                    MUSTERMANN                 MAX UND MARIAEUR          1692.45";
+        System.out.println("SecurityAccountOverview ");
+        showAnnotations(SecurityAccountOverview.class);
 
+        System.out.println("\n\n\n\nSecurityConfiguration ");
+        showAnnotations(SecurityAccountOverview.class);
+
+
+        //   parserTest();
+
+    }
+
+    private void showAnnotations(final Class c) {
+        final Field[] allFields = c.getDeclaredFields();
+
+        Arrays.asList(allFields).forEach(f -> {
+
+            System.out.println("field name " + f.getName());
+            Annotation[] annotations = f.getAnnotations();
+
+            Arrays.asList(annotations).forEach(a -> {
+                System.out.println("      annotation name " + a.annotationType().getSimpleName());
+                if (a instanceof StringField) {
+                    StringField sf = (StringField) a;
+                    System.out.println("            align  " + sf.align());
+                    System.out.println("            pos  " + sf.position());
+                    System.out.println("            len  " + sf.length());
+                    System.out.println("            padding  '" + sf.padding() + "'");
+                    System.out.println("            paddingcharacter  '" + sf.paddingCharacter() + "'");
+                }
+
+                if (a instanceof BigDecimalField) {
+                    BigDecimalField bd = (BigDecimalField) a;
+                    System.out.println("            align  " + bd.align());
+                    System.out.println("            pos  " + bd.position());
+                    System.out.println("            len  " + bd.length());
+                    System.out.println("            padding  '" + bd.padding() + "'");
+                }
+
+                if (a instanceof RiskCategoryField) {
+                    RiskCategoryField field = (RiskCategoryField) a;
+                    System.out.println("            align  " + field.align());
+                    System.out.println("            pos  " + field.position());
+                    System.out.println("            len  " + field.length());
+                }
+
+                if (a instanceof DepotOwnerField) {
+                    DepotOwnerField field = (DepotOwnerField) a;
+                    System.out.println("            align  " + field.align());
+                    System.out.println("            pos  " + field.position());
+                    System.out.println("            lengthFirstName  " + field.lengthFirstName());
+                    System.out.println("            lengthLastName  " + field.lengthLastName());
+                    System.out.println("            padding  '" + field.padding() + "'");
+                }
+            });
+        });
+    }
+
+    private void parserTest() throws FieldParserException {
+        final String source = "SecurityAccountOverview                 012345678900                    MUSTERMANN                 MAX UND MARIAEUR          1692.45";
 
         int pos = 0;
         int len = 40;
@@ -53,8 +125,8 @@ public class Parser {
 
         pos += len;
         len = 17;
-        NumDoubleParser balanceParser = new NumDoubleParser(pos, len, AlignmentEnum.RIGHT, '0');
-        Double balance = balanceParser.parseValue(source);
+        BigDecimalParser balanceParser = new BigDecimalParser(pos, len, AlignmentEnum.RIGHT, '0');
+        BigDecimal balance = balanceParser.parseValue(source);
 
         pos += len;
 
@@ -68,9 +140,5 @@ public class Parser {
 
         System.out.println("pos   '" + pos + "'");
         System.out.println("len(source)   '" + source.length() + "'");
-
-
-
-
     }
 }
