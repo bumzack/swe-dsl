@@ -5,6 +5,7 @@ package at.technikum.wien.mse.swe.model;
  */
 public class DepotOwner {
 
+
     private String firstname;
     private String lastname;
 
