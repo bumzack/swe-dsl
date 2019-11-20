@@ -1,14 +1,20 @@
 package at.technikum.wien.mse.swe.dslconnector;
 
-import at.technikum.wien.mse.swe.dslconnector.annotations.*;
+import at.technikum.wien.mse.swe.dslconnector.annotations.BigDecimalField;
+import at.technikum.wien.mse.swe.dslconnector.annotations.DepotOwnerField;
+import at.technikum.wien.mse.swe.dslconnector.annotations.RiskCategoryField;
+import at.technikum.wien.mse.swe.dslconnector.annotations.StringField;
+import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
+import at.technikum.wien.mse.swe.dslconnector.parser.*;
 import at.technikum.wien.mse.swe.model.SecurityAccountOverview;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Parser {
 
@@ -32,113 +38,99 @@ public class Parser {
 //        }
 
 
-        System.out.println("SecurityAccountOverview ");
-        showAnnotations(SecurityAccountOverview.class);
-
-        System.out.println("\n\n\n\nSecurityConfiguration ");
-        showAnnotations(SecurityAccountOverview.class);
-
-
-        //   parserTest();
+        parserTest();
 
     }
 
-    private void showAnnotations(final Class c) {
+    private List<FieldParser> getParserList(final Class c) {
         final Field[] allFields = c.getDeclaredFields();
 
-        Arrays.asList(allFields).forEach(f -> {
+        final List<FieldParser> parser = Arrays.asList(allFields).stream().map(f -> {
 
             System.out.println("field name " + f.getName());
             Annotation[] annotations = f.getAnnotations();
 
-            Arrays.asList(annotations).forEach(a -> {
-                System.out.println("      annotation name " + a.annotationType().getSimpleName());
-                if (a instanceof StringField) {
-                    StringField sf = (StringField) a;
-                    System.out.println("            align  " + sf.align());
-                    System.out.println("            pos  " + sf.position());
-                    System.out.println("            len  " + sf.length());
-                    System.out.println("            padding  '" + sf.padding() + "'");
-                    System.out.println("            paddingcharacter  '" + sf.paddingCharacter() + "'");
-                }
+            return Arrays.asList(annotations).stream()
+                    .map(a -> {
+                        System.out.println("      annotation name " + a.annotationType().getSimpleName());
+                        if (a instanceof StringField) {
+                            printStringField((StringField) a);
+                            StringField field = (StringField) a;
+                            return new StringParser(field.position(), field.length(), field.align(), field.padding(), field.paddingCharacter());
+                        }
 
-                if (a instanceof BigDecimalField) {
-                    BigDecimalField bd = (BigDecimalField) a;
-                    System.out.println("            align  " + bd.align());
-                    System.out.println("            pos  " + bd.position());
-                    System.out.println("            len  " + bd.length());
-                    System.out.println("            padding  '" + bd.padding() + "'");
-                }
+                        if (a instanceof BigDecimalField) {
+                            printBigDecimal(a);
+                            BigDecimalField field = (BigDecimalField) a;
+                            return new BigDecimalParser(field.position(), field.length(), field.align(), field.padding());
+                        }
 
-                if (a instanceof RiskCategoryField) {
-                    RiskCategoryField field = (RiskCategoryField) a;
-                    System.out.println("            align  " + field.align());
-                    System.out.println("            pos  " + field.position());
-                    System.out.println("            len  " + field.length());
-                }
+                        if (a instanceof RiskCategoryField) {
+                            printRiskCategory(a);
+                            RiskCategoryField field = (RiskCategoryField) a;
+                            return new RiskCategoryParser(field.position(), field.length(), field.align(), field.padding());
+                        }
 
-                if (a instanceof DepotOwnerField) {
-                    DepotOwnerField field = (DepotOwnerField) a;
-                    System.out.println("            align  " + field.align());
-                    System.out.println("            pos  " + field.position());
-                    System.out.println("            lengthFirstName  " + field.lengthFirstName());
-                    System.out.println("            lengthLastName  " + field.lengthLastName());
-                    System.out.println("            padding  '" + field.padding() + "'");
-                }
-            });
-        });
+                        if (a instanceof DepotOwnerField) {
+                            printDepotOwner(a);
+                            DepotOwnerField field = (DepotOwnerField) a;
+                            return new DeptOwnerParser(field.position(), field.lengthFirstName(), field.lengthLastName(), field.align(), field.padding());
+                        }
+                        // TODO ...
+                        return null;
+                    })
+                    .findFirst()
+                    // TODO
+                    .get();
+        }).collect(Collectors.toList());
+        return parser;
+    }
+
+    private void printDepotOwner(Annotation a) {
+        DepotOwnerField field = (DepotOwnerField) a;
+        System.out.println("            align  " + field.align());
+        System.out.println("            pos  " + field.position());
+        System.out.println("            lengthFirstName  " + field.lengthFirstName());
+        System.out.println("            lengthLastName  " + field.lengthLastName());
+        System.out.println("            padding  '" + field.padding() + "'");
+    }
+
+    private void printRiskCategory(Annotation a) {
+        RiskCategoryField field = (RiskCategoryField) a;
+        System.out.println("            align  " + field.align());
+        System.out.println("            pos  " + field.position());
+        System.out.println("            len  " + field.length());
+    }
+
+    private void printBigDecimal(Annotation a) {
+        BigDecimalField bd = (BigDecimalField) a;
+        System.out.println("            align  " + bd.align());
+        System.out.println("            pos  " + bd.position());
+        System.out.println("            len  " + bd.length());
+        System.out.println("            padding  '" + bd.padding() + "'");
+    }
+
+    private void printStringField(Annotation a) {
+        StringField sf = (StringField) a;
+        System.out.println("            align  " + sf.align());
+        System.out.println("            pos  " + sf.position());
+        System.out.println("            len  " + sf.length());
+        System.out.println("            padding  '" + sf.padding() + "'");
+        System.out.println("            paddingcharacter  '" + sf.paddingCharacter() + "'");
     }
 
     private void parserTest() throws FieldParserException {
         final String source = "SecurityAccountOverview                 012345678900                    MUSTERMANN                 MAX UND MARIAEUR          1692.45";
 
-        int pos = 0;
-        int len = 40;
-        StringParser transactionNameParser = new StringParser(pos, len, AlignmentEnum.LEFT, ' ');
-        String transactionName = transactionNameParser.parseValue(source);
 
-        pos += len;
-        len = 10;
+        List<FieldParser> parserList = getParserList(SecurityAccountOverview.class);
 
-        NumLongParser securityAccountNumberParser = new NumLongParser(pos, len, AlignmentEnum.RIGHT, '0');
-        Long securtityAcountNumber = securityAccountNumberParser.parseValue(source);
-
-        pos += len;
-        len = 2;
-        NumLongParser riskCatergoryParser = new NumLongParser(pos, len, AlignmentEnum.RIGHT, '0');
-        Long riskCategory = riskCatergoryParser.parseValue(source);
-
-        pos += len;
-        len = 30;
-        StringParser lastnameParser = new StringParser(pos, len, AlignmentEnum.RIGHT, '0');
-        String lastName = lastnameParser.parseValue(source);
-
-        pos += len;
-        len = 30;
-        StringParser firstnameParser = new StringParser(pos, len, AlignmentEnum.RIGHT, '0');
-        String firstName = firstnameParser.parseValue(source);
-
-        pos += len;
-        len = 3;
-        StringParser currencyParser = new StringParser(pos, len, AlignmentEnum.RIGHT, '0');
-        String currency = currencyParser.parseValue(source);
-
-        pos += len;
-        len = 17;
-        BigDecimalParser balanceParser = new BigDecimalParser(pos, len, AlignmentEnum.RIGHT, '0');
-        BigDecimal balance = balanceParser.parseValue(source);
-
-        pos += len;
-
-        System.out.println("transactionName   '" + transactionName + "'");
-        System.out.println("securtityAcountNumber   '" + securtityAcountNumber + "'");
-        System.out.println("riskCategory   '" + riskCategory + "'");
-        System.out.println("lastName   '" + lastName + "'");
-        System.out.println("firstName   '" + firstName + "'");
-        System.out.println("currency   '" + currency + "'");
-        System.out.println("balance   '" + balance + "'");
-
-        System.out.println("pos   '" + pos + "'");
-        System.out.println("len(source)   '" + source.length() + "'");
+        parserList.forEach(p -> {
+            try {
+                System.out.println("parsed value  " + p.parseValue(source));
+            } catch (FieldParserException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

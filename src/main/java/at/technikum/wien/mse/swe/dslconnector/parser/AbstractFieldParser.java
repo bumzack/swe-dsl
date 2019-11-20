@@ -1,6 +1,7 @@
-package at.technikum.wien.mse.swe.dslconnector;
+package at.technikum.wien.mse.swe.dslconnector.parser;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
+import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import org.apache.commons.lang.StringUtils;
 
 public abstract class AbstractFieldParser<T> implements FieldParser<T> {
@@ -29,5 +30,6 @@ public abstract class AbstractFieldParser<T> implements FieldParser<T> {
 
         return fieldStringTrimmed;
     }
+
 
 }

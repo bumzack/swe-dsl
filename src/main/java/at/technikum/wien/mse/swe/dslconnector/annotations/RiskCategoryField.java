@@ -13,4 +13,6 @@ public @interface RiskCategoryField {
     int length() default 2;
 
     AlignmentEnum align() default AlignmentEnum.LEFT;
+
+    char padding() default ' ';
 }

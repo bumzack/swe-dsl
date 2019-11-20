@@ -1,5 +1,7 @@
 package at.technikum.wien.mse.swe.dslconnector;
 
+import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
+
 public class Main {
     public static void main(String[] args) {
         final Parser p = new Parser();

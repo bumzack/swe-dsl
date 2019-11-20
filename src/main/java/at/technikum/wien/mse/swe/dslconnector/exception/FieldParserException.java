@@ -1,4 +1,4 @@
-package at.technikum.wien.mse.swe.dslconnector;
+package at.technikum.wien.mse.swe.dslconnector.exception;
 
 public class FieldParserException  extends Exception{
     public FieldParserException(final String message) {
