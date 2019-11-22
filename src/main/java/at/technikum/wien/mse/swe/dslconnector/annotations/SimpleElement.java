@@ -9,8 +9,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SimpleElement {
     int position();
+
     int length();
+
     boolean padding() default true;
+
     char paddingCharacter() default ' ';
+
     AlignmentEnum align();
 }
