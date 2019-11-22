@@ -11,13 +11,14 @@ public class SecurityAccountOverview {
     @StringField(position = 40, length = 10, align = AlignmentEnum.RIGHT, paddingCharacter = '0')
     private String accountNumber;
 
-    @RiskCategoryField(position = 52)
+    @RiskCategoryField(position = 50)
     private RiskCategory riskCategory;
 
-    @DepotOwnerField(position = 52, lengthFirstName = 30, lengthLastName = 30)
+    @DepotOwnerField(position = 52, lengthFirstName = 30, lengthLastName = 30, padding = true, paddingChar = ' ', align = AlignmentEnum.RIGHT)
     private DepotOwner depotOwner;
 
-    @BigDecimalField(position = 115, length = 10)
+    @AmountField(positionBalance = 115, lengthBalance = 17, alignBalance = AlignmentEnum.RIGHT,
+            positionCurrency = 112, lengthCurrency = 3, alignCurrency = AlignmentEnum.LEFT)
     private Amount balance;
 
     public String getAccountNumber() {

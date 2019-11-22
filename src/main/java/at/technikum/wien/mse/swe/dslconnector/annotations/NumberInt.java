@@ -11,6 +11,10 @@ import java.lang.annotation.Target;
 public @interface NumberInt {
     int position();
     int length();
-    char padding();
-    AlignmentEnum align();
+
+    boolean padding() default true;
+
+    char paddingCharacter() default '0';
+
+    AlignmentEnum align() default AlignmentEnum.RIGHT;
 }

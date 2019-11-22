@@ -9,10 +9,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RiskCategoryField {
     int position();
-
     int length() default 2;
-
     AlignmentEnum align() default AlignmentEnum.LEFT;
 
-    char padding() default ' ';
+    boolean padding() default false;
+
+    char paddingChar() default ' ';
 }

@@ -6,11 +6,12 @@ import org.apache.commons.lang.StringUtils;
 
 public class NumLongParser extends AbstractFieldParser {
 
-    public NumLongParser(int pos, int len, AlignmentEnum alignment, char padding) {
+    public NumLongParser(int pos, int len, AlignmentEnum alignment, boolean padding, char paddingCharater) {
         this.pos = pos;
         this.len = len;
         this.alignment = alignment;
         this.padding = padding;
+        this.paddingCharacter = paddingCharater;
     }
 
     public Long parseValue(final String source) throws FieldParserException {

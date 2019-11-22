@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import java.math.BigDecimal;
 
 public class BigDecimalParser extends AbstractFieldParser {
-    public BigDecimalParser(int pos, int len, AlignmentEnum alignment, char padding) {
+    public BigDecimalParser(int pos, int len, AlignmentEnum alignment, boolean padding, char paddingCharacter) {
         this.pos = pos;
         this.len = len;
         this.alignment = alignment;
@@ -21,9 +21,10 @@ public class BigDecimalParser extends AbstractFieldParser {
         }
 
         try {
-            return BigDecimal.valueOf(Double.valueOf(parsedString));
+            Double d = Double.parseDouble(parsedString);
+            return BigDecimal.valueOf(d);
         } catch (NumberFormatException e) {
-            throw new FieldParserException("cant read double at field with position " + pos + ", len: " + len + " in source string '" + source + "'");
+            throw new FieldParserException("cant read bigdecimal at field with position " + pos + ", len: " + len + " in source string '" + source + "'");
         }
     }
 }

@@ -10,6 +10,9 @@ import java.lang.annotation.Target;
 public @interface BigDecimalField {
     int position();
     int length();
-    char padding() default '0';
+
+    boolean padding() default true;
+
+    char paddingCharacter() default '0';
     AlignmentEnum align() default AlignmentEnum.RIGHT;
 }

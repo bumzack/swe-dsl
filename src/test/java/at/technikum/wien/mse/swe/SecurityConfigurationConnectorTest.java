@@ -1,6 +1,6 @@
 package at.technikum.wien.mse.swe;
 
-import at.technikum.wien.mse.swe.connector.SecurityConfigurationConnectorImpl;
+import at.technikum.wien.mse.swe.dslconnector.impl.DslSecurityConfigurationConnector;
 import at.technikum.wien.mse.swe.model.RiskCategory;
 import at.technikum.wien.mse.swe.model.SecurityConfiguration;
 import org.junit.Test;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class SecurityConfigurationConnectorTest {
 
-    private final SecurityConfigurationConnector sut = new SecurityConfigurationConnectorImpl();
+    private final SecurityConfigurationConnector sut = new DslSecurityConfigurationConnector();
     private static final String FILENAME = "examples/SecurityConfiguration_AT0000937503.txt";
 
     @Test

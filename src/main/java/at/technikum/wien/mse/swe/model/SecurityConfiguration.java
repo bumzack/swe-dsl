@@ -1,27 +1,26 @@
 package at.technikum.wien.mse.swe.model;
 
-import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
-import at.technikum.wien.mse.swe.dslconnector.annotations.BigDecimalField;
-import at.technikum.wien.mse.swe.dslconnector.annotations.RiskCategoryField;
-import at.technikum.wien.mse.swe.dslconnector.annotations.StringField;
+import at.technikum.wien.mse.swe.dslconnector.annotations.*;
 
 /**
  * @author MatthiasKreuzriegler
  */
 public class SecurityConfiguration {
-    @StringField(position = 52, length = 12, align = AlignmentEnum.RIGHT, padding = false)
+    @IsinField(position = 40, length = 12, align = AlignmentEnum.LEFT, padding = false)
     private ISIN isin;
 
-    @RiskCategoryField(position = 50)
+    @RiskCategoryField(position = 52)
     private RiskCategory riskCategory;
 
     @StringField(position = 54, length = 30, align = AlignmentEnum.RIGHT)
     private String name;
 
-    @BigDecimalField(position = 87, length = 10)
+    @AmountField(positionBalance = 87, lengthBalance = 10, alignBalance = AlignmentEnum.RIGHT,
+            positionCurrency = 84, lengthCurrency = 3, alignCurrency = AlignmentEnum.LEFT)
     private Amount yearHighest;
 
-    @BigDecimalField(position = 97, length = 10)
+    @AmountField(positionBalance = 97, lengthBalance = 10, alignBalance = AlignmentEnum.RIGHT,
+            positionCurrency = 84, lengthCurrency = 3, alignCurrency = AlignmentEnum.LEFT)
     private Amount yearLowest;
 
     public ISIN getIsin() {
@@ -62,5 +61,16 @@ public class SecurityConfiguration {
 
     public void setYearLowest(Amount yearLowest) {
         this.yearLowest = yearLowest;
+    }
+
+
+    @Override
+    public String toString() {
+        return "SecurityConfiguration{" +
+                "isin='" + isin + '\'' +
+                ", riskCategory=" + riskCategory +
+                ", name=" + name +
+                ", yearHighest=" + yearHighest +
+                ", yearLowest=" + yearLowest + '}';
     }
 }

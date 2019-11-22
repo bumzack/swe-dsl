@@ -11,6 +11,9 @@ public @interface DepotOwnerField {
     int position();
     int lengthFirstName();
     int lengthLastName();
-    char padding() default ' ';
+
+    char paddingChar() default ' ';
+
+    boolean padding() default true;
     AlignmentEnum align() default AlignmentEnum.LEFT;
 }

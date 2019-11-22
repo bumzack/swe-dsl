@@ -7,9 +7,13 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TxtField {
+public @interface IsinField {
     int position();
     int length();
-    char padding();
+
+    boolean padding() default true;
+
+    char paddingCharacter() default ' ';
     AlignmentEnum align();
+
 }

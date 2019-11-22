@@ -24,4 +24,9 @@ public class DepotOwner {
     public void setLastname(String lastname) {
         this.lastname = lastname;
     }
+
+    @Override
+    public String toString() {
+        return "[ DepotOwner:  fn: '" + firstname + "', ln: '" + lastname + "' ]";
+    }
 }

@@ -27,6 +27,8 @@ public class Parser {
         supportedAnnotations.put(DepotOwnerField.class.getSimpleName(), DeptOwnerParser.class);
         supportedAnnotations.put(NumberInt.class.getSimpleName(), NumLongParser.class);
         supportedAnnotations.put(RiskCategoryField.class.getSimpleName(), RiskCategoryParser.class);
+        supportedAnnotations.put(AmountField.class.getSimpleName(), AmountParser.class);
+        supportedAnnotations.put(IsinField.class.getSimpleName(), IsinParser.class);
     }
 
     public Parser() {
@@ -49,7 +51,30 @@ public class Parser {
     }
 
     private Object parseSecurityConfiguration(final String source) {
-        return null;
+        final List<Field> fields = Arrays.asList(SecurityConfiguration.class.getDeclaredFields());
+        final List<Field> annotatedFields = fields.stream()
+                .filter(this::filterAnnotatedFields)
+                .collect(Collectors.toList());
+
+        final Map<Field, FieldParser> fieldParsers = new HashMap<>();
+        annotatedFields.forEach(f -> {
+            try {
+                fieldParsers.put(f, getParser(f));
+            } catch (FieldParserException e) {
+                System.out.println("error parseSecurityAccountOverview call to 'getParser': " + e.getMessage());
+            }
+        });
+
+        final SecurityConfiguration securityConfiguration = new SecurityConfiguration();
+        fieldParsers.forEach((field, parser) -> {
+            try {
+
+                setFieldValue2(securityConfiguration, field, parser.parseValue(source));
+            } catch (FieldParserException e) {
+                System.out.println("error parseSecurityAccountOverview call to 'setFieldValue2'\n   " + e.getMessage());
+            }
+        });
+        return securityConfiguration;
     }
 
     private Object parseSecurityAccountOverview(final String source) {
@@ -70,9 +95,10 @@ public class Parser {
         final SecurityAccountOverview securityAccountOverview = new SecurityAccountOverview();
         fieldParsers.forEach((field, parser) -> {
             try {
+
                 setFieldValue2(securityAccountOverview, field, parser.parseValue(source));
             } catch (FieldParserException e) {
-                System.out.println("error parseSecurityAccountOverview call to 'setFieldValue2' : " + e.getMessage());
+                System.out.println("error parseSecurityAccountOverview call to 'setFieldValue2'\n   " + e.getMessage());
             }
         });
         return securityAccountOverview;
@@ -119,17 +145,28 @@ public class Parser {
 
                     if (a instanceof BigDecimalField) {
                         BigDecimalField field = (BigDecimalField) a;
-                        return new BigDecimalParser(field.position(), field.length(), field.align(), field.padding());
+                        return new BigDecimalParser(field.position(), field.length(), field.align(), field.padding(), field.paddingCharacter());
                     }
 
                     if (a instanceof RiskCategoryField) {
                         RiskCategoryField field = (RiskCategoryField) a;
-                        return new RiskCategoryParser(field.position(), field.length(), field.align(), field.padding());
+                        return new RiskCategoryParser(field.position(), field.length(), field.align(), field.padding(), field.paddingChar());
                     }
 
                     if (a instanceof DepotOwnerField) {
                         DepotOwnerField field = (DepotOwnerField) a;
-                        return new DeptOwnerParser(field.position(), field.lengthFirstName(), field.lengthLastName(), field.align(), field.padding());
+                        return new DeptOwnerParser(field.position(), field.lengthFirstName(), field.lengthLastName(), field.align(), field.padding(), field.paddingChar());
+                    }
+
+                    if (a instanceof AmountField) {
+                        AmountField field = (AmountField) a;
+                        return new AmountParser(field.positionBalance(), field.lengthBalance(), field.alignBalance(), field.paddingBalance(), field.paddingCharacterBalance(),
+                                field.positionCurrency(), field.lengthCurrency(), field.alignCurrency(), field.paddingCurrency(), field.paddingCharacterCurrency());
+                    }
+
+                    if (a instanceof IsinField) {
+                        IsinField field = (IsinField) a;
+                        return new IsinParser(field.position(), field.length(), field.align(), field.padding(), field.paddingCharacter());
                     }
                     return null;
                 })

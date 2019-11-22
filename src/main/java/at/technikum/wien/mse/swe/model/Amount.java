@@ -30,4 +30,9 @@ public class Amount {
     public void setValue(BigDecimal value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "[ Amount:  currency: '" + currency + "', value: '" + value + "' ]";
+    }
 }
