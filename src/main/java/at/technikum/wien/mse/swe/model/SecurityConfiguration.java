@@ -12,7 +12,7 @@ public class SecurityConfiguration {
     @RiskCategoryField(position = 52)
     private RiskCategory riskCategory;
 
-    @StringField(position = 54, length = 30, align = AlignmentEnum.RIGHT)
+    @SimpleElement(position = 54, length = 30, align = AlignmentEnum.RIGHT)
     private String name;
 
     @AmountField(positionBalance = 87, lengthBalance = 10, alignBalance = AlignmentEnum.RIGHT,

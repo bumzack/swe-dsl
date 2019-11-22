@@ -1,6 +1,7 @@
-package at.technikum.wien.mse.swe.dslconnector.parser;
+package at.technikum.wien.mse.swe.dslconnector.parser.impl;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
+import at.technikum.wien.mse.swe.dslconnector.parser.AbstractFieldParser;
 
 public class StringParser extends AbstractFieldParser {
 

@@ -28,7 +28,7 @@ public class DslSecurityAccountOverviewConnector implements SecurityAccountOverv
             final SecurityAccountOverview securityAccountOverview = parser.parse(content, SecurityAccountOverview.class);
             return securityAccountOverview;
         } catch (FieldParserException e) {
-            System.out.println("Error parsing the string '" + content + "'");
+            System.out.println("Error parsing the string '" + content + "' \n  exception: " + e.getMessage());
         }
 
         return null;

@@ -28,7 +28,7 @@ public class DslSecurityConfigurationConnector implements SecurityConfigurationC
             final SecurityConfiguration securityConfiguration = parser.parse(content, SecurityConfiguration.class);
             return securityConfiguration;
         } catch (FieldParserException e) {
-            System.out.println("Error parsing the string '" + content + "'");
+            System.out.println("Error parsing the string '" + content + "' \n  exception: " + e.getMessage());
         }
 
         return null;

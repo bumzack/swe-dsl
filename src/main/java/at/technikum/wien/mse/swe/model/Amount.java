@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public class Amount {
 
     private String currency;
+
     private BigDecimal value;
 
     public Amount(String currency, BigDecimal value) {

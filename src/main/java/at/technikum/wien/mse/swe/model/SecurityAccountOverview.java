@@ -8,7 +8,7 @@ import at.technikum.wien.mse.swe.dslconnector.annotations.*;
 
 public class SecurityAccountOverview {
 
-    @StringField(position = 40, length = 10, align = AlignmentEnum.RIGHT, paddingCharacter = '0')
+    @SimpleElement(position = 40, length = 10, align = AlignmentEnum.RIGHT, paddingCharacter = '0')
     private String accountNumber;
 
     @RiskCategoryField(position = 50)

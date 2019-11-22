@@ -1,7 +1,8 @@
-package at.technikum.wien.mse.swe.dslconnector.parser;
+package at.technikum.wien.mse.swe.dslconnector.parser.impl;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
+import at.technikum.wien.mse.swe.dslconnector.parser.FieldParser;
 import at.technikum.wien.mse.swe.model.ISIN;
 
 public class IsinParser implements FieldParser {

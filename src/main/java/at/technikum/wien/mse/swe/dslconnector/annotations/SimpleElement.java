@@ -5,16 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface NumberInt {
+public @interface SimpleElement {
     int position();
     int length();
-
     boolean padding() default true;
-
-    char paddingCharacter() default '0';
-
-    AlignmentEnum align() default AlignmentEnum.RIGHT;
+    char paddingCharacter() default ' ';
+    AlignmentEnum align();
 }

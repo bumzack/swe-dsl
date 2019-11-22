@@ -2,31 +2,28 @@ package at.technikum.wien.mse.swe.dslconnector;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.*;
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
-import at.technikum.wien.mse.swe.dslconnector.parser.*;
-import org.apache.commons.lang.StringUtils;
+import at.technikum.wien.mse.swe.dslconnector.parser.FieldParser;
+import at.technikum.wien.mse.swe.dslconnector.parser.ParserFactory;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
+
+import static at.technikum.wien.mse.swe.dslconnector.ReflectionHelper.*;
+import static java.util.stream.Collectors.toList;
 
 public class Parser {
 
-    private Map<String, Class> supportedAnnotations;
+    private List<String> supportedAnnotations;
 
     public void init() {
-        supportedAnnotations = new HashMap<>();
-        supportedAnnotations.put(StringField.class.getSimpleName(), StringParser.class);
-        supportedAnnotations.put(BigDecimalField.class.getSimpleName(), BigDecimalParser.class);
-        supportedAnnotations.put(DepotOwnerField.class.getSimpleName(), DeptOwnerParser.class);
-        supportedAnnotations.put(NumberInt.class.getSimpleName(), NumLongParser.class);
-        supportedAnnotations.put(RiskCategoryField.class.getSimpleName(), RiskCategoryParser.class);
-        supportedAnnotations.put(AmountField.class.getSimpleName(), AmountParser.class);
-        supportedAnnotations.put(IsinField.class.getSimpleName(), IsinParser.class);
+        supportedAnnotations = new ArrayList<>();
+        supportedAnnotations.add(DepotOwnerField.class.getSimpleName());
+        supportedAnnotations.add(RiskCategoryField.class.getSimpleName());
+        supportedAnnotations.add(AmountField.class.getSimpleName());
+        supportedAnnotations.add(IsinField.class.getSimpleName());
+        supportedAnnotations.add(SimpleElement.class.getSimpleName());
     }
 
     public Parser() {
@@ -37,32 +34,78 @@ public class Parser {
 
         final List<Field> annotatedFields = getAnnotatedFields(c);
 
+        annotatedFields.forEach(af -> System.out.println("\t\t   field " + af.getName() + " type: " + af.getType()));
+
         final Map<Field, FieldParser> fieldParsers = getFieldParsers(annotatedFields);
 
-        final T obj = createEmptyObject(c);
+        final T obj;
+        if (hasAllSetters(annotatedFields, c)) {
+            obj = createByEmptyConstructor(c);
+            populateObject(source, fieldParsers, obj);
+        } else {
+            obj = createAndPopulateWithConstructor(c, source, fieldParsers);
+        }
+        return obj;
+    }
 
-        populateObject(source, fieldParsers, obj);
+    private <T> T createAndPopulateWithConstructor(Class<T> c, String source, Map<Field, FieldParser> fieldParsers) throws FieldParserException {
+        // create an array with the types the constructor must provide
+        final List<Class> constructorArgTypes = fieldParsers.keySet().stream()
+                .map(Field::getType)
+                .collect(toList());
+
+        constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
+
+
+        // \_(ツ)_/¯
+        Class[] cl = constructorArgTypes.toArray(new Class[0]);
+
+        Constructor<?> cons = null;
+        try {
+            cons = c.getConstructor(cl);
+        } catch (Exception e) {
+            throw new FieldParserException("no constructor found for argument types " + constructorArgTypes);
+        }
+
+        final Object[] args = fieldParsers.values().stream()
+                .map(parser -> {
+                    try {
+                        return parser.parseValue(source);
+                    } catch (FieldParserException e) {
+                        System.out.println("exception in parseValue: " + e.getMessage());
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .toArray();
+
+        final T obj;
+        try {
+            obj = (T) cons.newInstance(args);
+        } catch (Exception e) {
+            throw new FieldParserException("error creating obj of type " + c.getSimpleName() + " using constructor types: " + constructorArgTypes + " and param values " + args);
+        }
 
         return obj;
     }
 
-    private <T> void populateObject(String source, Map<Field, FieldParser> fieldParsers, T obj) {
+    private <T> void populateObject(final String source, final Map<Field, FieldParser> fieldParsers, final T obj) {
         fieldParsers.forEach((field, parser) -> {
             try {
                 setFieldValue(obj, field, parser.parseValue(source));
             } catch (FieldParserException e) {
-                System.out.println("error parseSecurityAccountOverview call to 'setFieldValue2'\n   " + e.getMessage());
+                System.out.println("error populateObject  call to 'setFieldValue2'\n   " + e.getMessage());
             }
         });
     }
 
     private Map<Field, FieldParser> getFieldParsers(List<Field> annotatedFields) {
-        final Map<Field, FieldParser> fieldParsers = new HashMap<>();
+        final Map<Field, FieldParser> fieldParsers = new LinkedHashMap<>();
         annotatedFields.forEach(f -> {
             try {
                 fieldParsers.put(f, getParser(f));
             } catch (FieldParserException e) {
-                System.out.println("error parseSecurityAccountOverview call to 'getParser': " + e.getMessage());
+                System.out.println("error getFieldParsers call to 'getParser': " + e.getMessage());
             }
         });
         return fieldParsers;
@@ -72,36 +115,7 @@ public class Parser {
         final List<Field> fields = Arrays.asList(c.getDeclaredFields());
         return fields.stream()
                 .filter(this::filterAnnotatedFields)
-                .collect(Collectors.toList());
-    }
-
-    private <T> T createEmptyObject(Class<T> c) throws FieldParserException {
-        final T obj;
-        try {
-            obj = c.newInstance();
-        } catch (Exception e) {
-            throw new FieldParserException("error creating a new objeckt of type    " + c.getSimpleName() + "      " + e.getMessage());
-        }
-        return obj;
-    }
-
-    private <T, U> void setFieldValue(final T o, final Field field, final U value) throws FieldParserException {
-        final String setter = StringUtils.join(new String[]{"set", StringUtils.capitalize(field.getName())});
-
-        try {
-            Class tmp = o.getClass();
-
-            final Method setterMethod = getSetterMethod(tmp, setter);
-
-            // bold move, but setter has always 1 parameter ...
-            final String fieldType = setterMethod.getParameterTypes()[0].getSimpleName();
-
-            setterMethod.invoke(o, value);
-
-        } catch (Exception ex) {
-            System.out.println(String.format("error setting the value of field '%s'.     ex %s", field.getName(), ex.getMessage()));
-            throw new FieldParserException(String.format("error setting the value of field '%s'.  exception: %s", field.getName(), ex.getMessage()));
-        }
+                .collect(toList());
     }
 
     private FieldParser getParser(final Field f) throws FieldParserException {
@@ -111,40 +125,7 @@ public class Parser {
         }
 
         final FieldParser parser = annotations.stream()
-                .map(a -> {
-                    // TODO: try to use the  map here, otherwise the map is useless
-                    if (a instanceof StringField) {
-                        StringField field = (StringField) a;
-                        return new StringParser(field.position(), field.length(), field.align(), field.padding(), field.paddingCharacter());
-                    }
-
-                    if (a instanceof BigDecimalField) {
-                        BigDecimalField field = (BigDecimalField) a;
-                        return new BigDecimalParser(field.position(), field.length(), field.align(), field.padding(), field.paddingCharacter());
-                    }
-
-                    if (a instanceof RiskCategoryField) {
-                        RiskCategoryField field = (RiskCategoryField) a;
-                        return new RiskCategoryParser(field.position(), field.length(), field.align(), field.padding(), field.paddingChar());
-                    }
-
-                    if (a instanceof DepotOwnerField) {
-                        DepotOwnerField field = (DepotOwnerField) a;
-                        return new DeptOwnerParser(field.position(), field.lengthFirstName(), field.lengthLastName(), field.align(), field.padding(), field.paddingChar());
-                    }
-
-                    if (a instanceof AmountField) {
-                        AmountField field = (AmountField) a;
-                        return new AmountParser(field.positionBalance(), field.lengthBalance(), field.alignBalance(), field.paddingBalance(), field.paddingCharacterBalance(),
-                                field.positionCurrency(), field.lengthCurrency(), field.alignCurrency(), field.paddingCurrency(), field.paddingCharacterCurrency());
-                    }
-
-                    if (a instanceof IsinField) {
-                        IsinField field = (IsinField) a;
-                        return new IsinParser(field.position(), field.length(), field.align(), field.padding(), field.paddingCharacter());
-                    }
-                    return null;
-                })
+                .map(a -> ParserFactory.getParserForType(f.getType().getTypeName(), a))
                 .findFirst()
                 .orElseThrow(() -> new FieldParserException("No Parser found for field '" + f.getName()));
         return parser;
@@ -153,16 +134,7 @@ public class Parser {
     private boolean filterAnnotatedFields(final Field f) {
         final List<Annotation> annotations = Arrays.asList(f.getAnnotations());
         final boolean res = annotations.stream()
-                .anyMatch(a -> supportedAnnotations.containsKey(a.annotationType().getSimpleName()));
+                .anyMatch(a -> supportedAnnotations.contains(a.annotationType().getSimpleName()));
         return res;
-    }
-
-    private Method getSetterMethod(final Class c, final String name) {
-        final List<Method> methods = Arrays.asList(c.getDeclaredMethods());
-        final Method method = methods.stream()
-                .filter(m -> StringUtils.equalsIgnoreCase(m.getName(), name))
-                .findFirst()
-                .orElse(null);
-        return method;
     }
 }

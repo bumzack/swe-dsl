@@ -9,11 +9,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DepotOwnerField {
     int position();
+
     int lengthFirstName();
+
     int lengthLastName();
 
     char paddingChar() default ' ';
 
     boolean padding() default true;
+
     AlignmentEnum align() default AlignmentEnum.LEFT;
 }
