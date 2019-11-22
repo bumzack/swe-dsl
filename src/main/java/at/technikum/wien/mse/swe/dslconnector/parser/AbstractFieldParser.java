@@ -19,9 +19,9 @@ public abstract class AbstractFieldParser implements FieldParser {
 
         if (simpleTypeDto.isPadding()) {
             if (simpleTypeDto.getAlignment().equals(AlignmentEnum.LEFT)) {
-                fieldStringTrimmed = StringUtils.stripStart(fieldString, paddingString);
-            } else {
                 fieldStringTrimmed = StringUtils.stripEnd(fieldString, paddingString);
+            } else {
+                fieldStringTrimmed = StringUtils.stripStart(fieldString, paddingString);
             }
         }
         return fieldStringTrimmed;

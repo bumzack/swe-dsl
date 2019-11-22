@@ -2,7 +2,6 @@ package at.technikum.wien.mse.swe.model;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
 import at.technikum.wien.mse.swe.dslconnector.annotations.ComplexElement;
-import at.technikum.wien.mse.swe.dslconnector.annotations.RiskCategoryField;
 import at.technikum.wien.mse.swe.dslconnector.annotations.SimpleElement;
 
 /**
@@ -14,7 +13,8 @@ public class SecurityAccountOverview {
     @SimpleElement(position = 40, length = 10, align = AlignmentEnum.RIGHT, paddingCharacter = '0')
     private String accountNumber;
 
-    @RiskCategoryField(position = 50)
+    @ComplexElement(name = {"code"}, position = {50}, length = {2}, align = {AlignmentEnum.LEFT}, padding = {false}, paddingCharacter = {' '})
+
     private RiskCategory riskCategory;
 
     @ComplexElement(name = {"lastname", "firstname"}, position = {52, 82}, length = {30, 30}, align = {AlignmentEnum.RIGHT, AlignmentEnum.RIGHT},

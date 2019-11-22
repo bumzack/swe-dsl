@@ -17,8 +17,7 @@ public class SecurityConfiguration {
     @ComplexElement(name = {"code"}, position = {52}, length = {2}, align = {AlignmentEnum.LEFT}, padding = {false}, paddingCharacter = {' '})
     private RiskCategory riskCategory;
 
-
-    @SimpleElement(position = 54, length = 12, align = AlignmentEnum.RIGHT)
+    @SimpleElement(position = 54, length = 30, align = AlignmentEnum.RIGHT)
     private String name;
 
 //    @AmountField(positionBalance = 87, lengthBalance = 10, alignBalance = AlignmentEnum.RIGHT,

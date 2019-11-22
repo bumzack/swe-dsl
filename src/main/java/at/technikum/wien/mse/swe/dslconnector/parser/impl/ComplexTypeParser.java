@@ -6,7 +6,6 @@ import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import at.technikum.wien.mse.swe.dslconnector.parser.FieldParser;
 import at.technikum.wien.mse.swe.dslconnector.parser.impl.dto.ComplexTypeDto;
 import at.technikum.wien.mse.swe.dslconnector.parser.impl.dto.SimpleTypeDto;
-import at.technikum.wien.mse.swe.model.RiskCategory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -67,11 +66,6 @@ public class ComplexTypeParser implements FieldParser {
                 .map(entry -> {
                     final Field f = availableFields.get(entry.getKey());
                     final SimpleTypeDto simpleTypeDto = SimpleTypeDto.map(entry.getValue());
-
-                    if (((Class) t).getSimpleName().equals(RiskCategory.class.getSimpleName())) {
-                        final FieldParser fieldParser = new RiskCategoryParser(simpleTypeDto);
-                        return new AbstractMap.SimpleEntry<>(f, fieldParser);
-                    }
                     final FieldParser fieldParser = new SimpleTypeParser(f.getType(), simpleTypeDto);
                     return new AbstractMap.SimpleEntry<>(f, fieldParser);
                 })

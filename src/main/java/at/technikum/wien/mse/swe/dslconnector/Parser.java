@@ -5,6 +5,8 @@ import at.technikum.wien.mse.swe.dslconnector.annotations.SimpleElement;
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import at.technikum.wien.mse.swe.dslconnector.parser.FieldParser;
 import at.technikum.wien.mse.swe.dslconnector.parser.ParserFactory;
+import at.technikum.wien.mse.swe.model.RiskCategory;
+import org.apache.commons.lang.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -46,12 +48,39 @@ public class Parser {
         /// fields.forEach(af -> System.out.println("\t\t   field " + af.getName() + " type: " + af.getType()));
 
         final T obj;
-        if (hasConstructorWithFields(c, fields)) {
-            obj = createAndPopulateWithConstructor(c, source, fieldParsers);
+        if (c.isEnum()) {
+            obj = getEnum(source, c, fieldParsers);
         } else {
-            obj = createByEmptyConstructor(c);
-            populateObject(source, fieldParsers, obj);
+            if (hasConstructorWithFields(c, fields)) {
+                obj = createAndPopulateWithConstructor(c, source, fieldParsers);
+            } else {
+                obj = createByEmptyConstructor(c);
+                populateObject(source, fieldParsers, obj);
+            }
         }
+        return obj;
+    }
+
+    private <T> T getEnum(final String source, final Class<T> c, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
+        T obj;
+        System.out.println("got an enum");
+        if (fieldParsers.keySet().size() != 1) {
+            throw new FieldParserException("error creating obj of type " + c.getSimpleName() + " cant create an enum with more than 1 or less than field. ");
+        }
+
+        Optional<FieldParser> fp = fieldParsers.values().stream().findFirst();
+        if (!fp.isPresent()) {
+            throw new FieldParserException("error creating obj of type " + c.getSimpleName() + " cant find a FieldParser");
+        }
+        final String enumValue = fp.get().parseValue(source);
+
+        // thanks IntelliJ
+        T obj1;
+        if (StringUtils.isEmpty(enumValue)) {
+            obj1 = null;
+        }
+        obj1 = (T) RiskCategory.fromCode(enumValue).orElseThrow(() -> new FieldParserException("can't read enum at field with position "));
+        obj = obj1;
         return obj;
     }
 
@@ -60,11 +89,16 @@ public class Parser {
                 .map(Field::getType)
                 .collect(toList());
 
-        ///  constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
+        constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
 
         // \_(ツ)_/¯
         Class[] cl = constructorArgTypes.toArray(new Class[0]);
         Constructor<?> cons = null;
+
+        // delete me
+        Arrays.asList(c.getDeclaredConstructors()).forEach(cc -> System.out.println("\t\t   getDeclaredConstructors    " + cc.getName()));
+
+
         try {
             cons = c.getConstructor(cl);
         } catch (Exception e) {
@@ -120,7 +154,7 @@ public class Parser {
             try {
                 setFieldValue(obj, field, parser.parseValue(source));
             } catch (FieldParserException e) {
-                // System.out.println("error populateObject  call to 'setFieldValue'\n   " + e.getMessage());
+                System.out.println("error populateObject  call to 'setFieldValue'\n   " + e.getMessage());
             }
         });
     }
