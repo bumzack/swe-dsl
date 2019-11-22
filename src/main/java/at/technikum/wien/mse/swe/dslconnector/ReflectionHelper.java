@@ -36,7 +36,7 @@ public class ReflectionHelper {
         try {
             obj = c.newInstance();
         } catch (Exception e) {
-            throw new FieldParserException("error creating a new object of type    " + c.getSimpleName() + "      " + e.getMessage());
+            throw new FieldParserException("createByEmptyConstructor    error creating a new object of type    " + c.getSimpleName() + "      " + e.getMessage());
         }
         return obj;
     }

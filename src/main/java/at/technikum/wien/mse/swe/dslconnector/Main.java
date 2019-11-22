@@ -4,7 +4,8 @@ import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import at.technikum.wien.mse.swe.dslconnector.impl.DslSecurityAccountOverviewConnector;
 import at.technikum.wien.mse.swe.dslconnector.impl.DslSecurityConfigurationConnector;
 import at.technikum.wien.mse.swe.exception.SecurityAccountOverviewReadException;
-import at.technikum.wien.mse.swe.model.Person;
+import at.technikum.wien.mse.swe.model.PersonConstructor;
+import at.technikum.wien.mse.swe.model.PersonSetter;
 import at.technikum.wien.mse.swe.model.SecurityAccountOverview;
 import at.technikum.wien.mse.swe.model.SecurityConfiguration;
 
@@ -18,26 +19,33 @@ public class Main {
     private static final String FILENAME = "examples/SecurityAccountOverview_0123456789.txt";
     private static final String FILENAME_CONFIGURATION = "examples/SecurityConfiguration_AT0000937503.txt";
 
-    public static void main(String[] args) throws URISyntaxException, FieldParserException {
+    public static void main(String[] args) throws FieldParserException {
         testPerson();
 //        testOverview();
 //        testConfiguration();
     }
 
     private static void testPerson() throws FieldParserException {
-        final String source = "Maxi      23.12";
+        final String source = "Maxi Muxi 13.12EUR  23.45         ";
 
         final Parser p = new Parser();
 
-        final Person person = p.parse(source, Person.class);
+        final PersonSetter personSetter = p.parse(source, PersonSetter.class);
 
         System.out.println("read line\n----------------------------------------------------------------------------------------------------------------");
         System.out.println(source);
         System.out.println("----------------------------------------------------------------------------------------------------------------");
 
-        System.out.println("\n\n\n object Person ");
+        System.out.println("\n\n\n object PersonSetter ");
         System.out.println("----------------------------------------------------------------------------------------------------------------");
-        System.out.println(person);
+        System.out.println(personSetter);
+        System.out.println("----------------------------------------------------------------------------------------------------------------");
+
+        final PersonConstructor personConstructor = p.parse(source, PersonConstructor.class);
+
+        System.out.println("\n\n\n object PersonConstructor ");
+        System.out.println("----------------------------------------------------------------------------------------------------------------");
+        System.out.println(personConstructor);
         System.out.println("----------------------------------------------------------------------------------------------------------------");
     }
 
@@ -50,7 +58,6 @@ public class Main {
         } catch (IOException e) {
             throw new SecurityAccountOverviewReadException(e);
         }
-
 
         SecurityAccountOverview overview = p.read(Paths.get(ClassLoader.getSystemResource(FILENAME).toURI()));
 
