@@ -11,7 +11,7 @@ import java.util.List;
 public class ReflectionHelper {
 
     static public <T> boolean hasAllSetters(final List<Field> annotatedFields, final Class<T> c) {
-        annotatedFields.forEach(af -> System.out.println("fieldname: " + af.getName()));
+        // annotatedFields.forEach(af -> System.out.println("fieldname: " + af.getName()));
         return annotatedFields.stream()
                 .allMatch(field -> hasSetterMethod(c, field.getName()));
     }
@@ -27,7 +27,7 @@ public class ReflectionHelper {
 
     static public boolean hasSetterMethod(final Class c, final String name) {
         final String setter = StringUtils.join(new String[]{"set", StringUtils.capitalize(name)});
-        System.out.println("setter name: " + setter);
+        // System.out.println("setter name: " + setter);
         return getSetterMethod(c, setter) != null;
     }
 

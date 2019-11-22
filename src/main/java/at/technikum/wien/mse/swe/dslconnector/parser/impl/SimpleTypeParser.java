@@ -19,7 +19,7 @@ public class SimpleTypeParser extends AbstractFieldParser {
     public <T> T parseValue(final String source) throws FieldParserException {
         final String parsed = parse(source);
         if (t.getTypeName().equals(String.class.getTypeName())) {
-            return (T) parsed;
+            return (T) StringUtils.trim(parsed);
         } else if (t.getTypeName().equals(BigDecimal.class.getTypeName())) {
             return (T) convertStringToBigDecimal(parsed);
         }

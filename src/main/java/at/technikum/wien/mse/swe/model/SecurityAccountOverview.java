@@ -1,6 +1,9 @@
 package at.technikum.wien.mse.swe.model;
 
-import at.technikum.wien.mse.swe.dslconnector.annotations.*;
+import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
+import at.technikum.wien.mse.swe.dslconnector.annotations.ComplexElement;
+import at.technikum.wien.mse.swe.dslconnector.annotations.RiskCategoryField;
+import at.technikum.wien.mse.swe.dslconnector.annotations.SimpleElement;
 
 /**
  * @author MatthiasKreuzriegler
@@ -14,11 +17,12 @@ public class SecurityAccountOverview {
     @RiskCategoryField(position = 50)
     private RiskCategory riskCategory;
 
-    @DepotOwnerField(position = 52, lengthFirstName = 30, lengthLastName = 30, padding = true, paddingChar = ' ', align = AlignmentEnum.RIGHT)
+    @ComplexElement(name = {"lastname", "firstname"}, position = {52, 82}, length = {30, 30}, align = {AlignmentEnum.RIGHT, AlignmentEnum.RIGHT},
+            padding = {true, true}, paddingCharacter = {' ', ' '})
     private DepotOwner depotOwner;
 
-    @AmountField(positionBalance = 115, lengthBalance = 17, alignBalance = AlignmentEnum.RIGHT,
-            positionCurrency = 112, lengthCurrency = 3, alignCurrency = AlignmentEnum.LEFT)
+    @ComplexElement(name = {"currency", "value"}, position = {112, 115}, length = {3, 17}, align = {AlignmentEnum.RIGHT, AlignmentEnum.LEFT},
+            padding = {true, true}, paddingCharacter = {' ', ' '})
     private Amount balance;
 
     public String getAccountNumber() {

@@ -18,7 +18,7 @@ public class ISIN {
 
     @Override
     public String toString() {
-        return "ISIN{" +
+        return "ISIN { " +
                 "value='" + value + '\'' + '}';
     }
 }

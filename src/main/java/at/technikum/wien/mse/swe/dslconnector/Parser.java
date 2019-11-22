@@ -31,19 +31,19 @@ public class Parser {
 
     public <T> T parse(final String source, final Class<T> c) throws FieldParserException {
         final List<Field> annotatedFields = getAnnotatedFields(c);
-        annotatedFields.forEach(af -> System.out.println("\t\t   field " + af));
+        // annotatedFields.forEach(af -> System.out.println("\t\t   field " + af));
         final Map<Field, FieldParser> fieldParsers = getFieldParsersByAnnotation(annotatedFields);
 
         return parseObject(source, c, annotatedFields, fieldParsers);
     }
 
     public <T> T parseComplexTypeObject(final String source, final Class<T> c, final List<Field> fields, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
-        fields.forEach(af -> System.out.println("\t\t   field " + af));
+        // fields.forEach(af -> System.out.println("\t\t   field " + af));
         return parseObject(source, c, fields, fieldParsers);
     }
 
     private <T> T parseObject(final String source, final Class<T> c, final List<Field> fields, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
-        fields.forEach(af -> System.out.println("\t\t   field " + af.getName() + " type: " + af.getType()));
+        /// fields.forEach(af -> System.out.println("\t\t   field " + af.getName() + " type: " + af.getType()));
 
         final T obj;
         if (hasConstructorWithFields(c, fields)) {
@@ -60,7 +60,7 @@ public class Parser {
                 .map(Field::getType)
                 .collect(toList());
 
-        constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
+        ///  constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
 
         // \_(ツ)_/¯
         Class[] cl = constructorArgTypes.toArray(new Class[0]);
@@ -80,7 +80,7 @@ public class Parser {
                 .map(Field::getType)
                 .collect(toList());
 
-        constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
+        /// constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
 
 
         // \_(ツ)_/¯
@@ -120,7 +120,7 @@ public class Parser {
             try {
                 setFieldValue(obj, field, parser.parseValue(source));
             } catch (FieldParserException e) {
-                System.out.println("error populateObject  call to 'setFieldValue'\n   " + e.getMessage());
+                // System.out.println("error populateObject  call to 'setFieldValue'\n   " + e.getMessage());
             }
         });
     }
@@ -140,7 +140,7 @@ public class Parser {
     private FieldParser getParserByAnnotation(final Field f) throws FieldParserException {
         final List<Annotation> annotations = Arrays.asList(f.getAnnotations());
         if (annotations.size() != 1) {
-            throw new FieldParserException("found " + annotations.size() + " annotations, nut can only handle 1 for each field");
+            throw new FieldParserException("found " + annotations.size() + " annotations, but can only handle 1 for each field");
         }
 
         final FieldParser parser = annotations.stream()

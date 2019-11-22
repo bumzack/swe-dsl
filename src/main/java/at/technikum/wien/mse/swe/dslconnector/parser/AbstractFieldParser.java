@@ -13,15 +13,15 @@ public abstract class AbstractFieldParser implements FieldParser {
     public abstract <T> T parseValue(final String source) throws FieldParserException;
 
     protected String parse(final String source) {
-        final String paddingString = String.valueOf(simpleTypeDto.getLen());
+        final String paddingString = String.valueOf(simpleTypeDto.getPaddingCharacter());
         final String fieldString = source.substring(simpleTypeDto.getPos(), simpleTypeDto.getPos() + simpleTypeDto.getLen());
-        String fieldStringTrimmed = "";
+        String fieldStringTrimmed = fieldString;
 
         if (simpleTypeDto.isPadding()) {
             if (simpleTypeDto.getAlignment().equals(AlignmentEnum.LEFT)) {
-                fieldStringTrimmed = StringUtils.stripEnd(fieldString, paddingString);
-            } else {
                 fieldStringTrimmed = StringUtils.stripStart(fieldString, paddingString);
+            } else {
+                fieldStringTrimmed = StringUtils.stripEnd(fieldString, paddingString);
             }
         }
         return fieldStringTrimmed;
