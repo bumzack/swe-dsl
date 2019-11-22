@@ -6,7 +6,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
 
-public class BigDecimalParser extends AbstractFieldParser<BigDecimal>{
+public class BigDecimalParser extends AbstractFieldParser {
     public BigDecimalParser(int pos, int len, AlignmentEnum alignment, char padding) {
         this.pos = pos;
         this.len = len;
@@ -26,6 +26,4 @@ public class BigDecimalParser extends AbstractFieldParser<BigDecimal>{
             throw new FieldParserException("cant read double at field with position " + pos + ", len: " + len + " in source string '" + source + "'");
         }
     }
-
-
 }

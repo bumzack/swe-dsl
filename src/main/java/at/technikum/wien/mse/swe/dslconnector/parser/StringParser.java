@@ -3,7 +3,7 @@ package at.technikum.wien.mse.swe.dslconnector.parser;
 import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
 import org.apache.commons.lang.StringUtils;
 
-public class StringParser implements FieldParser<String> {
+public class StringParser implements FieldParser {
 
     private boolean padding;
     private int pos;
@@ -26,10 +26,10 @@ public class StringParser implements FieldParser<String> {
 
     // TODO duplicate code - find another abtract class?
     protected String parse(final String source) {
-        System.out.println("parse()   pos = " + pos + " len = " + len + "    s.len = " + source.length() + "       s = '" + source + "'");
+        // System.out.println("parse()   pos = " + pos + " len = " + len + "    s.len = " + source.length() + "       s = '" + source + "'");
         final String paddingString = String.valueOf(paddingChar);
         final String fieldString = source.substring(pos, pos + len);
-        System.out.println("parse()   pos = " + pos + " len = " + len + "         s = '" + fieldString + "'");
+        // System.out.println("parse()   pos = " + pos + " len = " + len + "         s = '" + fieldString + "'");
 
         if (padding) {
             String fieldStringTrimmed = "";
@@ -38,11 +38,11 @@ public class StringParser implements FieldParser<String> {
             } else {
                 fieldStringTrimmed = StringUtils.stripStart(fieldString, paddingString);
             }
-            System.out.println("parse()   pos = " + pos + " len = " + len + "  trimmed s = '" + fieldStringTrimmed + "'");
+            // System.out.println("parse()   pos = " + pos + " len = " + len + "  trimmed s = '" + fieldStringTrimmed + "'");
             return fieldStringTrimmed;
         }
 
-        System.out.println("parse()    no trimming required  pos = " + pos + " len = " + len + "   s = '" + fieldString + "'");
+        // System.out.println("parse()    no trimming required  pos = " + pos + " len = " + len + "   s = '" + fieldString + "'");
 
         return fieldString;
     }

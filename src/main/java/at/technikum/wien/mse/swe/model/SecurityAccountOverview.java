@@ -5,6 +5,7 @@ import at.technikum.wien.mse.swe.dslconnector.annotations.*;
 /**
  * @author MatthiasKreuzriegler
  */
+
 public class SecurityAccountOverview {
 
     @StringField(position = 40, length = 10, align = AlignmentEnum.RIGHT, paddingCharacter = '0')

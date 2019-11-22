@@ -1,17 +1,16 @@
 package at.technikum.wien.mse.swe;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import at.technikum.wien.mse.swe.connector.SecurityConfigurationConnectorImpl;
+import at.technikum.wien.mse.swe.model.RiskCategory;
+import at.technikum.wien.mse.swe.model.SecurityConfiguration;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
-import org.junit.Test;
-
-import at.technikum.wien.mse.swe.connector.SecurityConfigurationConnectorImpl;
-import at.technikum.wien.mse.swe.model.RiskCategory;
-import at.technikum.wien.mse.swe.model.SecurityConfiguration;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author MatthiasKreuzriegler
@@ -20,7 +19,6 @@ public class SecurityConfigurationConnectorTest {
 
     private final SecurityConfigurationConnector sut = new SecurityConfigurationConnectorImpl();
     private static final String FILENAME = "examples/SecurityConfiguration_AT0000937503.txt";
-
 
     @Test
     public void testRead_notNull() throws URISyntaxException {

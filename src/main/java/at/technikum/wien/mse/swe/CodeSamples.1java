@@ -1,0 +1,143 @@
+package at.technikum.wien.mse.swe;
+
+class A {
+    public <T> T getObject(final Class c) throws FieldParserException {
+        Constructor<?> ctor;
+        try {
+            ctor = c.getConstructor(String.class);
+
+            //  ctor = c.getConstructor();
+        } catch (NoSuchMethodException e) {
+            System.out.println(String.format("no empty constructor found for entity '%s'.", c.getName()));
+            throw new FieldParserException(String.format("no empty constructor found for entity '%s'.", c.getName()));
+        }
+
+        try {
+            final T o = (T) ctor.newInstance();
+            return o;
+        } catch (Exception e) {
+            System.out.println(String.format("error creating an instance of class/entity '%s'.", c.getName()));
+            throw new FieldParserException(String.format("error creating an instance of class/entity '%s'.", c.getName()));
+        }
+    }
+
+    private List<FieldParser> getParserList(final Class c) {
+        final Field[] allFields = c.getDeclaredFields();
+
+        final List<FieldParser> parser = Arrays.asList(allFields).stream().map(f -> {
+
+            System.out.println("field name " + f.getName());
+            Annotation[] annotations = f.getAnnotations();
+
+            return Arrays.asList(annotations).stream()
+                    .map(a -> {
+                        System.out.println("      annotation name " + a.annotationType().getSimpleName());
+                        if (a instanceof SimpleField) {
+                            printSimpleField((SimpleField) a);
+                            SimpleField field = (SimpleField) a;
+                            Type t = f.getType();
+                            Class typeClass = f.getClass();
+
+                            System.out.println("type: " + t.getTypeName());
+
+                            try {
+                                Object o = getObject(typeClass);
+                                final String value = "dummy";
+                                setFieldValue(o, f.getName(), value);
+                            } catch (FieldParserException e) {
+                                e.printStackTrace();
+                            }
+                            return new StringParser(field.position(), field.length(), field.align(), true, 'a');
+                        }
+
+                        if (a instanceof StringField) {
+                            printStringField((StringField) a);
+                            StringField field = (StringField) a;
+                            return new StringParser(field.position(), field.length(), field.align(), field.padding(), field.paddingCharacter());
+                        }
+
+                        if (a instanceof BigDecimalField) {
+                            printBigDecimal(a);
+                            BigDecimalField field = (BigDecimalField) a;
+                            return new BigDecimalParser(field.position(), field.length(), field.align(), field.padding());
+                        }
+
+                        if (a instanceof RiskCategoryField) {
+                            printRiskCategory(a);
+                            RiskCategoryField field = (RiskCategoryField) a;
+                            return new RiskCategoryParser(field.position(), field.length(), field.align(), field.padding());
+                        }
+
+                        if (a instanceof DepotOwnerField) {
+                            printDepotOwner(a);
+                            DepotOwnerField field = (DepotOwnerField) a;
+                            return new DeptOwnerParser(field.position(), field.lengthFirstName(), field.lengthLastName(), field.align(), field.padding());
+                        }
+                        // TODO ...
+                        return null;
+                    })
+                    .findFirst()
+                    // TODO
+                    .get();
+        }).collect(Collectors.toList());
+        return parser;
+    }
+
+
+    private void printDepotOwner(Annotation a) {
+        DepotOwnerField field = (DepotOwnerField) a;
+        System.out.println("            align  " + field.align());
+        System.out.println("            pos  " + field.position());
+        System.out.println("            lengthFirstName  " + field.lengthFirstName());
+        System.out.println("            lengthLastName  " + field.lengthLastName());
+        System.out.println("            padding  '" + field.padding() + "'");
+    }
+
+    private void printRiskCategory(Annotation a) {
+        RiskCategoryField field = (RiskCategoryField) a;
+        System.out.println("            align  " + field.align());
+        System.out.println("            pos  " + field.position());
+        System.out.println("            len  " + field.length());
+    }
+
+    private void printBigDecimal(Annotation a) {
+        BigDecimalField bd = (BigDecimalField) a;
+        System.out.println("            align  " + bd.align());
+        System.out.println("            pos  " + bd.position());
+        System.out.println("            len  " + bd.length());
+        System.out.println("            padding  '" + bd.padding() + "'");
+    }
+
+    private void printStringField(Annotation a) {
+        StringField sf = (StringField) a;
+        System.out.println("            align  " + sf.align());
+        System.out.println("            pos  " + sf.position());
+        System.out.println("            len  " + sf.length());
+        System.out.println("            padding  '" + sf.padding() + "'");
+        System.out.println("            paddingcharacter  '" + sf.paddingCharacter() + "'");
+    }
+
+    private void printSimpleField(Annotation a) {
+        SimpleField sf = (SimpleField) a;
+        System.out.println("            align  " + sf.align());
+        System.out.println("            pos  " + sf.position());
+        System.out.println("            len  " + sf.length());
+        System.out.println("            padding  '" + sf.padding() + "'");
+        // System.out.println("            paddingcharacter  '" + sf.paddingCharacter() + "'");
+    }
+
+    private void parserTest() throws FieldParserException {
+        final String source = "SecurityAccountOverview                 012345678900                    MUSTERMANN                 MAX UND MARIAEUR          1692.45";
+
+        List<FieldParser> parserList = getParserList(SecurityAccountOverview.class);
+        SecurityAccountOverview accountOverview = new SecurityAccountOverview();
+
+        parserList.forEach(p -> {
+            try {
+                System.out.println("parsed value  " + p.parseValue(source));
+            } catch (FieldParserException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+}

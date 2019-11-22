@@ -1,24 +1,23 @@
 package at.technikum.wien.mse.swe;
 
-import static at.technikum.wien.mse.swe.model.RiskCategory.NON_EXISTING;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import at.technikum.wien.mse.swe.dslconnector.impl.DslSecurityAccountOverviewConnector;
+import at.technikum.wien.mse.swe.model.SecurityAccountOverview;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
-import org.junit.Test;
-
-import at.technikum.wien.mse.swe.connector.SecurityAccountOverviewConnectorImpl;
-import at.technikum.wien.mse.swe.model.SecurityAccountOverview;
+import static at.technikum.wien.mse.swe.model.RiskCategory.NON_EXISTING;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author MatthiasKreuzriegler
  */
 public class SecurityAccountOverviewConnectorTest {
 
-    private final SecurityAccountOverviewConnector sut = new SecurityAccountOverviewConnectorImpl();
+    private final SecurityAccountOverviewConnector sut = new DslSecurityAccountOverviewConnector();
     private static final String FILENAME = "examples/SecurityAccountOverview_12345678.txt";
 
 

@@ -3,7 +3,7 @@ package at.technikum.wien.mse.swe.dslconnector.parser;
 import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
 import at.technikum.wien.mse.swe.model.DepotOwner;
 
-public class DeptOwnerParser extends AbstractFieldParser<DepotOwner> {
+public class DeptOwnerParser extends AbstractFieldParser {
 
     private int lenLastName;
     private int lenFirstName;

@@ -4,7 +4,7 @@ import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import org.apache.commons.lang.StringUtils;
 
-public class NumLongParser extends AbstractFieldParser<Long> {
+public class NumLongParser extends AbstractFieldParser {
 
     public NumLongParser(int pos, int len, AlignmentEnum alignment, char padding) {
         this.pos = pos;
