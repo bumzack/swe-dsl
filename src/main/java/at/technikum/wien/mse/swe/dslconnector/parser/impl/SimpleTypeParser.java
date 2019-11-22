@@ -2,7 +2,7 @@ package at.technikum.wien.mse.swe.dslconnector.parser.impl;
 
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import at.technikum.wien.mse.swe.dslconnector.parser.AbstractFieldParser;
-import at.technikum.wien.mse.swe.dslconnector.parser.impl.dto.SimpleTypeDto;
+import at.technikum.wien.mse.swe.dslconnector.parser.dto.SimpleTypeDto;
 import at.technikum.wien.mse.swe.model.RiskCategory;
 import org.apache.commons.lang.StringUtils;
 
@@ -20,7 +20,7 @@ public class SimpleTypeParser extends AbstractFieldParser {
     public <T> T parseValue(final String source) throws FieldParserException {
         final String parsed = parse(source);
         if (t.getTypeName().equals(String.class.getTypeName())) {
-            return (T) StringUtils.trim(parsed);
+            return (T) parsed;
         } else if (t.getTypeName().equals(BigDecimal.class.getTypeName())) {
             return (T) convertStringToBigDecimal(parsed);
         } else if (t.getTypeName().equals(RiskCategory.class.getTypeName())) {

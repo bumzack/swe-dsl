@@ -2,7 +2,7 @@ package at.technikum.wien.mse.swe.dslconnector.parser;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
-import at.technikum.wien.mse.swe.dslconnector.parser.impl.dto.SimpleTypeDto;
+import at.technikum.wien.mse.swe.dslconnector.parser.dto.SimpleTypeDto;
 import org.apache.commons.lang.StringUtils;
 
 public abstract class AbstractFieldParser implements FieldParser {

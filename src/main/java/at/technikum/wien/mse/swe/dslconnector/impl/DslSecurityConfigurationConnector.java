@@ -5,6 +5,8 @@ import at.technikum.wien.mse.swe.dslconnector.Parser;
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import at.technikum.wien.mse.swe.exception.SecurityAccountOverviewReadException;
 import at.technikum.wien.mse.swe.model.SecurityConfiguration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class DslSecurityConfigurationConnector implements SecurityConfigurationConnector {
+    private static final Logger LOG = LogManager.getLogger(DslSecurityConfigurationConnector.class);
 
     @Override
     public SecurityConfiguration read(final Path file) {
@@ -28,7 +31,7 @@ public class DslSecurityConfigurationConnector implements SecurityConfigurationC
             final SecurityConfiguration securityConfiguration = parser.parse(content, SecurityConfiguration.class);
             return securityConfiguration;
         } catch (FieldParserException e) {
-            System.out.println("Error parsing the string '" + content + "' \n  exception: " + e.getMessage());
+            LOG.error("Error parsing the string '" + content + "'     exception: " + e.getMessage());
         }
 
         return null;

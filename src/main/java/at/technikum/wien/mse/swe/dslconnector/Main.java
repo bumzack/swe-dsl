@@ -8,6 +8,8 @@ import at.technikum.wien.mse.swe.model.PersonConstructor;
 import at.technikum.wien.mse.swe.model.PersonSetter;
 import at.technikum.wien.mse.swe.model.SecurityAccountOverview;
 import at.technikum.wien.mse.swe.model.SecurityConfiguration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,37 +18,36 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Main {
+    private static final Logger LOG = LogManager.getLogger(Main.class);
+
     private static final String FILENAME = "examples/SecurityAccountOverview_0123456789.txt";
     private static final String FILENAME_CONFIGURATION = "examples/SecurityConfiguration_AT0000937503.txt";
 
     public static void main(String[] args) throws FieldParserException, URISyntaxException {
-        //   testPerson();
-        //     testOverview();
+        testPerson();
+        testOverview();
         testConfiguration();
     }
 
     private static void testPerson() throws FieldParserException {
-        final String source = "Maxi Muxi 13.12EUR  23.45         ";
+        final String source = "Maxi Muxi 13.12EUR  23.451234a     unknown                            Street                        Stiege 1/3 ";
 
         final Parser p = new Parser();
 
         final PersonSetter personSetter = p.parse(source, PersonSetter.class);
 
-        System.out.println("read line\n----------------------------------------------------------------------------------------------------------------");
-        System.out.println(source);
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
+        LOG.trace("------ source ----------------------------------------------------------------------------------------------------------");
+        LOG.trace(source);
+        LOG.trace("----------------------------------------------------------------------------------------------------------------");
 
-        System.out.println("\n\n\n object PersonSetter ");
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
-        System.out.println(personSetter);
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
+        LOG.trace("----------object PersonSetter   ------------------------------------------------------------------------------------------------------");
+        LOG.trace(personSetter);
+        LOG.trace("----------------------------------------------------------------------------------------------------------------");
 
         final PersonConstructor personConstructor = p.parse(source, PersonConstructor.class);
-
-        System.out.println("\n\n\n object PersonConstructor ");
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
-        System.out.println(personConstructor);
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
+        LOG.trace("-----------   object PersonConstructor   -----------------------------------------------------------------------------------------------------");
+        LOG.trace(personConstructor);
+        LOG.trace("----------------------------------------------------------------------------------------------------------------");
     }
 
     private static void testOverview() throws URISyntaxException {
@@ -61,14 +62,13 @@ public class Main {
 
         SecurityAccountOverview overview = p.read(Paths.get(ClassLoader.getSystemResource(FILENAME).toURI()));
 
-        System.out.println("read line\n----------------------------------------------------------------------------------------------------------------");
-        System.out.println(content);
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
+        LOG.info("--------  read line ----------------------------------------------------------------------------------------------------------------");
+        LOG.info(content);
+        LOG.info("----------------------------------------------------------------------------------------------------------------");
 
-        System.out.println("\n\n\n object SecurityAccountOverview ");
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
-        System.out.println(overview);
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
+        LOG.info("----------- object SecurityAccountOverview  -----------------------------------------------------------------------------------------------------");
+        LOG.info(overview);
+        LOG.info("----------------------------------------------------------------------------------------------------------------");
     }
 
 
@@ -84,13 +84,12 @@ public class Main {
 
         SecurityConfiguration configuration = p.read(Paths.get(ClassLoader.getSystemResource(FILENAME_CONFIGURATION).toURI()));
 
-        System.out.println("read line\n----------------------------------------------------------------------------------------------------------------");
-        System.out.println(content);
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
+        LOG.info("-------    read line   ----------------------------------------------------------------------------------------------------------------");
+        LOG.info(content);
+        LOG.info("----------------------------------------------------------------------------------------------------------------");
 
-        System.out.println("\n\n\n object SecurityConfiguration ");
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
-        System.out.println(configuration);
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
+        LOG.info("---------- object SecurityConfiguration  ------------------------------------------------------------------------------------------------------");
+        LOG.info(configuration);
+        LOG.info("----------------------------------------------------------------------------------------------------------------");
     }
 }

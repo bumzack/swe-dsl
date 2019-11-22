@@ -4,8 +4,8 @@ import at.technikum.wien.mse.swe.dslconnector.Parser;
 import at.technikum.wien.mse.swe.dslconnector.annotations.ComplexElement;
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import at.technikum.wien.mse.swe.dslconnector.parser.FieldParser;
-import at.technikum.wien.mse.swe.dslconnector.parser.impl.dto.ComplexTypeDto;
-import at.technikum.wien.mse.swe.dslconnector.parser.impl.dto.SimpleTypeDto;
+import at.technikum.wien.mse.swe.dslconnector.parser.dto.ComplexTypeDto;
+import at.technikum.wien.mse.swe.dslconnector.parser.dto.SimpleTypeDto;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -48,9 +48,9 @@ public class ComplexTypeParser implements FieldParser {
                 .anyMatch(availableFields::containsKey);
 
         if (!allPresent) {
-            final String err = "at least one of the required fields in the list of ComplexTYpe names is not available in the class \n" +
-                    "fields in Annotation: " + complexTypeDtos.keySet().stream().toString() + "\n" +
-                    "available field in class " + ((Class) t).getSimpleName() + ": \n" +
+            final String err = "at least one of the required fields in the list of ComplexTYpe names is not available in the class " +
+                    "fields in Annotation: " + complexTypeDtos.keySet().stream().toString() +
+                    "available field in class " + ((Class) t).getSimpleName() + ": " +
                     availableFields.keySet().stream().toString();
             throw new FieldParserException(err);
         }

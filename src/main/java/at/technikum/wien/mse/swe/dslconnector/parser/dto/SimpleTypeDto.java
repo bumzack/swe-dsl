@@ -1,4 +1,4 @@
-package at.technikum.wien.mse.swe.dslconnector.parser.impl.dto;
+package at.technikum.wien.mse.swe.dslconnector.parser.dto;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
 import at.technikum.wien.mse.swe.dslconnector.annotations.SimpleElement;

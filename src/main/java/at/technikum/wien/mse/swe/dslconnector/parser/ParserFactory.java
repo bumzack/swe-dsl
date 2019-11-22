@@ -2,9 +2,9 @@ package at.technikum.wien.mse.swe.dslconnector.parser;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.ComplexElement;
 import at.technikum.wien.mse.swe.dslconnector.annotations.SimpleElement;
+import at.technikum.wien.mse.swe.dslconnector.parser.dto.SimpleTypeDto;
 import at.technikum.wien.mse.swe.dslconnector.parser.impl.ComplexTypeParser;
 import at.technikum.wien.mse.swe.dslconnector.parser.impl.SimpleTypeParser;
-import at.technikum.wien.mse.swe.dslconnector.parser.impl.dto.SimpleTypeDto;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;

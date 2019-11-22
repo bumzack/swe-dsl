@@ -2,6 +2,8 @@ package at.technikum.wien.mse.swe.dslconnector;
 
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -9,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ReflectionHelper {
+    private static final Logger LOG = LogManager.getLogger(ReflectionHelper.class);
 
     static public <T> boolean hasAllSetters(final List<Field> annotatedFields, final Class<T> c) {
         // annotatedFields.forEach(af -> System.out.println("fieldname: " + af.getName()));
@@ -36,6 +39,7 @@ public class ReflectionHelper {
         try {
             obj = c.newInstance();
         } catch (Exception e) {
+            LOG.error("error creating new object with empty constructor  of type    " + c.getSimpleName() + " " + e);
             throw new FieldParserException("createByEmptyConstructor    error creating a new object of type    " + c.getSimpleName() + "      " + e.getMessage());
         }
         return obj;
@@ -55,7 +59,7 @@ public class ReflectionHelper {
             setterMethod.invoke(o, value);
 
         } catch (Exception ex) {
-            System.out.println(String.format("error setting the value of field '%s'.     ex %s", field.getName(), ex.getMessage()));
+            LOG.error(String.format("error setting the value of field '%s'.     ex %s", field.getName(), ex.getMessage()));
             throw new FieldParserException(String.format("error setting the value of field '%s'.  exception: %s", field.getName(), ex.getMessage()));
         }
     }

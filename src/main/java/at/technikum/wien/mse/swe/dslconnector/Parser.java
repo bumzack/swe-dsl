@@ -7,6 +7,8 @@ import at.technikum.wien.mse.swe.dslconnector.parser.FieldParser;
 import at.technikum.wien.mse.swe.dslconnector.parser.ParserFactory;
 import at.technikum.wien.mse.swe.model.RiskCategory;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -18,6 +20,7 @@ import static at.technikum.wien.mse.swe.dslconnector.ReflectionHelper.setFieldVa
 import static java.util.stream.Collectors.toList;
 
 public class Parser {
+    private static final Logger LOG = LogManager.getLogger(Parser.class);
 
     private List<String> supportedAnnotations;
 
@@ -62,26 +65,19 @@ public class Parser {
     }
 
     private <T> T getEnum(final String source, final Class<T> c, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
-        T obj;
-        System.out.println("got an enum");
+        LOG.trace("got an enum - this so sad");
+
         if (fieldParsers.keySet().size() != 1) {
             throw new FieldParserException("error creating obj of type " + c.getSimpleName() + " cant create an enum with more than 1 or less than field. ");
         }
 
-        Optional<FieldParser> fp = fieldParsers.values().stream().findFirst();
-        if (!fp.isPresent()) {
-            throw new FieldParserException("error creating obj of type " + c.getSimpleName() + " cant find a FieldParser");
-        }
+        final Optional<FieldParser> fp = fieldParsers.values().stream().findFirst();
         final String enumValue = fp.get().parseValue(source);
 
-        // thanks IntelliJ
-        T obj1;
         if (StringUtils.isEmpty(enumValue)) {
-            obj1 = null;
+            return null;
         }
-        obj1 = (T) RiskCategory.fromCode(enumValue).orElseThrow(() -> new FieldParserException("can't read enum at field with position "));
-        obj = obj1;
-        return obj;
+        return (T) RiskCategory.fromCode(enumValue).orElseThrow(() -> new FieldParserException("can't read enum at field with position "));
     }
 
     private <T> boolean hasConstructorWithFields(final Class<T> c, final List<Field> fields) {
@@ -89,20 +85,16 @@ public class Parser {
                 .map(Field::getType)
                 .collect(toList());
 
-        constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
+        // constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
 
         // \_(ツ)_/¯
         Class[] cl = constructorArgTypes.toArray(new Class[0]);
         Constructor<?> cons = null;
 
-        // delete me
-        Arrays.asList(c.getDeclaredConstructors()).forEach(cc -> System.out.println("\t\t   getDeclaredConstructors    " + cc.getName()));
-
-
         try {
             cons = c.getConstructor(cl);
         } catch (Exception e) {
-            System.out.println("hasConstructorWithFields   no constructor with args " + constructorArgTypes);
+            LOG.info("hasConstructorWithFields   no constructor with args " + constructorArgTypes);
             return false;
         }
         return true;
@@ -132,7 +124,7 @@ public class Parser {
                     try {
                         return parser.parseValue(source);
                     } catch (FieldParserException e) {
-                        System.out.println("exception in parseValue: " + e.getMessage());
+                        LOG.error("exception in parseValue: " + e.getMessage());
                     }
                     return null;
                 })
@@ -154,7 +146,7 @@ public class Parser {
             try {
                 setFieldValue(obj, field, parser.parseValue(source));
             } catch (FieldParserException e) {
-                System.out.println("error populateObject  call to 'setFieldValue'\n   " + e.getMessage());
+                LOG.error("error populateObject  call to 'setFieldValue'      " + e.getMessage());
             }
         });
     }
@@ -165,7 +157,7 @@ public class Parser {
             try {
                 fieldParsers.put(f, getParserByAnnotation(f));
             } catch (FieldParserException e) {
-                System.out.println("error getFieldParsers call to 'getParser': " + e.getMessage());
+                LOG.error("error getFieldParsers call to 'getParser': " + e.getMessage());
             }
         });
         return fieldParsers;

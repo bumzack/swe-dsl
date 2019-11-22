@@ -25,6 +25,10 @@ public class PersonSetter {
             padding = {true, true}, paddingCharacter = {' ', ' '})
     private Amount balance;
 
+    @ComplexElement(name = {"zip", "town"}, position = {25, 35}, length = {4, 35}, align = {AlignmentEnum.LEFT, AlignmentEnum.LEFT},
+            padding = {true, true}, paddingCharacter = {' ', ' '})
+    private Address address;
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -41,6 +45,10 @@ public class PersonSetter {
         this.balance = balance;
     }
 
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
     @Override
     public String toString() {
         return "Person{" +
@@ -48,6 +56,7 @@ public class PersonSetter {
                 ", lastName=" + lastName +
                 ", bigDeci=" + bigDeci +
                 ", balance=" + balance +
+                ", address=" + address +
                 '}';
     }
 }
