@@ -3,9 +3,9 @@ package at.technikum.wien.mse.swe.dslconnector;
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import at.technikum.wien.mse.swe.dslconnector.impl.DslSecurityAccountOverviewConnector;
 import at.technikum.wien.mse.swe.dslconnector.impl.DslSecurityConfigurationConnector;
+import at.technikum.wien.mse.swe.dslconnector.model.PersonConstructor;
+import at.technikum.wien.mse.swe.dslconnector.model.PersonSetter;
 import at.technikum.wien.mse.swe.exception.SecurityAccountOverviewReadException;
-import at.technikum.wien.mse.swe.model.PersonConstructor;
-import at.technikum.wien.mse.swe.model.PersonSetter;
 import at.technikum.wien.mse.swe.model.SecurityAccountOverview;
 import at.technikum.wien.mse.swe.model.SecurityConfiguration;
 import org.apache.logging.log4j.LogManager;
@@ -32,19 +32,25 @@ public class Main {
     private static void testPerson() throws FieldParserException {
         final String source = "Maxi Muxi 13.12EUR  23.451234a     unknown                            Street                        Stiege 1/3 ";
 
-        final Parser p = new Parser();
+        final GenericMapper p = new GenericMapper();
 
-        final PersonSetter personSetter = p.parse(source, PersonSetter.class);
+        final PersonSetter personSetter = p.map(source, PersonSetter.class);
 
+        LOG.trace("");
+        LOG.trace("");
         LOG.trace("------ source ----------------------------------------------------------------------------------------------------------");
         LOG.trace(source);
         LOG.trace("----------------------------------------------------------------------------------------------------------------");
 
+        LOG.trace("");
+        LOG.trace("");
         LOG.trace("----------object PersonSetter   ------------------------------------------------------------------------------------------------------");
         LOG.trace(personSetter);
         LOG.trace("----------------------------------------------------------------------------------------------------------------");
 
-        final PersonConstructor personConstructor = p.parse(source, PersonConstructor.class);
+        final PersonConstructor personConstructor = p.map(source, PersonConstructor.class);
+        LOG.trace("");
+        LOG.trace("");
         LOG.trace("-----------   object PersonConstructor   -----------------------------------------------------------------------------------------------------");
         LOG.trace(personConstructor);
         LOG.trace("----------------------------------------------------------------------------------------------------------------");
@@ -61,16 +67,18 @@ public class Main {
         }
 
         SecurityAccountOverview overview = p.read(Paths.get(ClassLoader.getSystemResource(FILENAME).toURI()));
+        LOG.trace("");
+        LOG.trace("");
+        LOG.trace("--------  read line ----------------------------------------------------------------------------------------------------------------");
+        LOG.trace(content);
+        LOG.trace("----------------------------------------------------------------------------------------------------------------");
 
-        LOG.info("--------  read line ----------------------------------------------------------------------------------------------------------------");
-        LOG.info(content);
-        LOG.info("----------------------------------------------------------------------------------------------------------------");
-
-        LOG.info("----------- object SecurityAccountOverview  -----------------------------------------------------------------------------------------------------");
-        LOG.info(overview);
-        LOG.info("----------------------------------------------------------------------------------------------------------------");
+        LOG.trace("");
+        LOG.trace("");
+        LOG.trace("----------- object SecurityAccountOverview  -----------------------------------------------------------------------------------------------------");
+        LOG.trace(overview);
+        LOG.trace("----------------------------------------------------------------------------------------------------------------");
     }
-
 
     private static void testConfiguration() throws URISyntaxException {
         final DslSecurityConfigurationConnector p = new DslSecurityConfigurationConnector();
@@ -83,13 +91,16 @@ public class Main {
         }
 
         SecurityConfiguration configuration = p.read(Paths.get(ClassLoader.getSystemResource(FILENAME_CONFIGURATION).toURI()));
+        LOG.trace("");
+        LOG.trace("");
+        LOG.trace("-------    read line   ----------------------------------------------------------------------------------------------------------------");
+        LOG.trace(content);
+        LOG.trace("----------------------------------------------------------------------------------------------------------------");
 
-        LOG.info("-------    read line   ----------------------------------------------------------------------------------------------------------------");
-        LOG.info(content);
-        LOG.info("----------------------------------------------------------------------------------------------------------------");
-
-        LOG.info("---------- object SecurityConfiguration  ------------------------------------------------------------------------------------------------------");
-        LOG.info(configuration);
-        LOG.info("----------------------------------------------------------------------------------------------------------------");
+        LOG.trace("");
+        LOG.trace("");
+        LOG.trace("---------- object SecurityConfiguration  ------------------------------------------------------------------------------------------------------");
+        LOG.trace(configuration);
+        LOG.trace("----------------------------------------------------------------------------------------------------------------");
     }
 }

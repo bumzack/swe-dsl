@@ -8,8 +8,6 @@ import at.technikum.wien.mse.swe.dslconnector.annotations.SimpleElement;
  * @author MatthiasKreuzriegler
  */
 public class SecurityConfiguration {
-    //   @IsinField(position = 40, length = 12, align = AlignmentEnum.LEFT, padding = false)
-
     @ComplexElement(name = {"value"}, position = {40}, length = {12}, align = {AlignmentEnum.LEFT},
             padding = {false}, paddingCharacter = {' '})
     private ISIN isin;
@@ -20,15 +18,9 @@ public class SecurityConfiguration {
     @SimpleElement(position = 54, length = 30, align = AlignmentEnum.RIGHT)
     private String name;
 
-//    @AmountField(positionBalance = 87, lengthBalance = 10, alignBalance = AlignmentEnum.RIGHT,
-//            positionCurrency = 84, lengthCurrency = 3, alignCurrency = AlignmentEnum.LEFT)
-
     @ComplexElement(name = {"currency", "value"}, position = {84, 87}, length = {3, 10}, align = {AlignmentEnum.RIGHT, AlignmentEnum.LEFT},
             padding = {true, true}, paddingCharacter = {' ', ' '})
     private Amount yearHighest;
-
-    //    @AmountField(positionBalance = 97, lengthBalance = 10, alignBalance = AlignmentEnum.RIGHT,
-    //        positionCurrency = 84, lengthCurrency = 3, alignCurrency = AlignmentEnum.LEFT)
 
     @ComplexElement(name = {"currency", "value"}, position = {84, 97}, length = {3, 10}, align = {AlignmentEnum.RIGHT, AlignmentEnum.LEFT},
             padding = {true, true}, paddingCharacter = {' ', ' '})

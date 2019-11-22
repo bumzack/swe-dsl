@@ -1,4 +1,4 @@
-package at.technikum.wien.mse.swe.model;
+package at.technikum.wien.mse.swe.dslconnector.model;
 
 /**
  * @author gs

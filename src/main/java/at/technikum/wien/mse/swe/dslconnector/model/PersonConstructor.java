@@ -1,8 +1,9 @@
-package at.technikum.wien.mse.swe.model;
+package at.technikum.wien.mse.swe.dslconnector.model;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
 import at.technikum.wien.mse.swe.dslconnector.annotations.ComplexElement;
 import at.technikum.wien.mse.swe.dslconnector.annotations.SimpleElement;
+import at.technikum.wien.mse.swe.model.Amount;
 
 import java.math.BigDecimal;
 

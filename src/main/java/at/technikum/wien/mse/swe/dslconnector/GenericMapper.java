@@ -15,12 +15,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.*;
 
-import static at.technikum.wien.mse.swe.dslconnector.ReflectionHelper.createByEmptyConstructor;
-import static at.technikum.wien.mse.swe.dslconnector.ReflectionHelper.setFieldValue;
+import static at.technikum.wien.mse.swe.dslconnector.ReflectionHelper.*;
 import static java.util.stream.Collectors.toList;
 
-public class Parser {
-    private static final Logger LOG = LogManager.getLogger(Parser.class);
+public class GenericMapper {
+    private static final Logger LOG = LogManager.getLogger(GenericMapper.class);
 
     private List<String> supportedAnnotations;
 
@@ -30,24 +29,24 @@ public class Parser {
         supportedAnnotations.add(ComplexElement.class.getSimpleName());
     }
 
-    public Parser() {
+    public GenericMapper() {
         init();
     }
 
-    public <T> T parse(final String source, final Class<T> c) throws FieldParserException {
+    public <T> T map(final String source, final Class<T> c) throws FieldParserException {
         final List<Field> annotatedFields = getAnnotatedFields(c);
         // annotatedFields.forEach(af -> System.out.println("\t\t   field " + af));
         final Map<Field, FieldParser> fieldParsers = getFieldParsersByAnnotation(annotatedFields);
 
-        return parseObject(source, c, annotatedFields, fieldParsers);
+        return mapToObject(source, c, annotatedFields, fieldParsers);
     }
 
-    public <T> T parseComplexTypeObject(final String source, final Class<T> c, final List<Field> fields, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
+    public <T> T mapComplexTypeToObject(final String source, final Class<T> c, final List<Field> fields, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
         // fields.forEach(af -> System.out.println("\t\t   field " + af));
-        return parseObject(source, c, fields, fieldParsers);
+        return mapToObject(source, c, fields, fieldParsers);
     }
 
-    private <T> T parseObject(final String source, final Class<T> c, final List<Field> fields, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
+    private <T> T mapToObject(final String source, final Class<T> c, final List<Field> fields, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
         /// fields.forEach(af -> System.out.println("\t\t   field " + af.getName() + " type: " + af.getType()));
 
         final T obj;
@@ -65,14 +64,15 @@ public class Parser {
     }
 
     private <T> T getEnum(final String source, final Class<T> c, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
-        LOG.trace("got an enum - this so sad");
+        LOG.trace("got an enum - this is soooo sad");
 
         if (fieldParsers.keySet().size() != 1) {
+            LOG.error("error creating obj of type " + c.getSimpleName() + " cant create an enum with more than 1 or less than field. ");
             throw new FieldParserException("error creating obj of type " + c.getSimpleName() + " cant create an enum with more than 1 or less than field. ");
         }
 
-        final Optional<FieldParser> fp = fieldParsers.values().stream().findFirst();
-        final String enumValue = fp.get().parseValue(source);
+        final FieldParser fp = fieldParsers.values().stream().findFirst().get();
+        final String enumValue = fp.parseValue(source);
 
         if (StringUtils.isEmpty(enumValue)) {
             return null;
@@ -80,34 +80,11 @@ public class Parser {
         return (T) RiskCategory.fromCode(enumValue).orElseThrow(() -> new FieldParserException("can't read enum at field with position "));
     }
 
-    private <T> boolean hasConstructorWithFields(final Class<T> c, final List<Field> fields) {
-        final List<Class> constructorArgTypes = fields.stream()
-                .map(Field::getType)
-                .collect(toList());
-
-        // constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
-
-        // \_(ツ)_/¯
-        Class[] cl = constructorArgTypes.toArray(new Class[0]);
-        Constructor<?> cons = null;
-
-        try {
-            cons = c.getConstructor(cl);
-        } catch (Exception e) {
-            LOG.info("hasConstructorWithFields   no constructor with args " + constructorArgTypes);
-            return false;
-        }
-        return true;
-    }
-
     private <T> T createAndPopulateWithConstructor(final Class<T> c, final String source, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
         // create an array with the types the constructor must provide
         final List<Class> constructorArgTypes = fieldParsers.keySet().stream()
                 .map(Field::getType)
                 .collect(toList());
-
-        /// constructorArgTypes.forEach(carg -> System.out.println("\t\t   construcotr args   " + carg.getSimpleName()));
-
 
         // \_(ツ)_/¯
         Class[] cl = constructorArgTypes.toArray(new Class[0]);

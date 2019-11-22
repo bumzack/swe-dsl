@@ -1,6 +1,6 @@
 package at.technikum.wien.mse.swe.dslconnector.parser.impl;
 
-import at.technikum.wien.mse.swe.dslconnector.Parser;
+import at.technikum.wien.mse.swe.dslconnector.GenericMapper;
 import at.technikum.wien.mse.swe.dslconnector.annotations.ComplexElement;
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import at.technikum.wien.mse.swe.dslconnector.parser.FieldParser;
@@ -61,7 +61,7 @@ public class ComplexTypeParser implements FieldParser {
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
 
-        final Parser parser = new Parser();
+        final GenericMapper genericMapper = new GenericMapper();
         final Map<Field, FieldParser> fieldParsers = complexTypeDtos.entrySet().stream()
                 .map(entry -> {
                     final Field f = availableFields.get(entry.getKey());
@@ -71,6 +71,6 @@ public class ComplexTypeParser implements FieldParser {
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return (T) parser.parseComplexTypeObject(source, (Class) t, fields, fieldParsers);
+        return (T) genericMapper.mapComplexTypeToObject(source, (Class) t, fields, fieldParsers);
     }
 }

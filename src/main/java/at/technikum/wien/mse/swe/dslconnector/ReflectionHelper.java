@@ -5,19 +5,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 public class ReflectionHelper {
     private static final Logger LOG = LogManager.getLogger(ReflectionHelper.class);
-
-    static public <T> boolean hasAllSetters(final List<Field> annotatedFields, final Class<T> c) {
-        // annotatedFields.forEach(af -> System.out.println("fieldname: " + af.getName()));
-        return annotatedFields.stream()
-                .allMatch(field -> hasSetterMethod(c, field.getName()));
-    }
 
     static public Method getSetterMethod(final Class c, final String name) {
         final List<Method> methods = Arrays.asList(c.getDeclaredMethods());
@@ -26,12 +23,6 @@ public class ReflectionHelper {
                 .findFirst()
                 .orElse(null);
         return method;
-    }
-
-    static public boolean hasSetterMethod(final Class c, final String name) {
-        final String setter = StringUtils.join(new String[]{"set", StringUtils.capitalize(name)});
-        // System.out.println("setter name: " + setter);
-        return getSetterMethod(c, setter) != null;
     }
 
     static public <T> T createByEmptyConstructor(Class<T> c) throws FieldParserException {
@@ -62,5 +53,23 @@ public class ReflectionHelper {
             LOG.error(String.format("error setting the value of field '%s'.     ex %s", field.getName(), ex.getMessage()));
             throw new FieldParserException(String.format("error setting the value of field '%s'.  exception: %s", field.getName(), ex.getMessage()));
         }
+    }
+
+    static public <T> boolean hasConstructorWithFields(final Class<T> c, final List<Field> fields) {
+        final List<Class> constructorArgTypes = fields.stream()
+                .map(Field::getType)
+                .collect(toList());
+
+        // \_(ツ)_/¯
+        Class[] cl = constructorArgTypes.toArray(new Class[0]);
+        Constructor<?> cons = null;
+
+        try {
+            cons = c.getConstructor(cl);
+        } catch (Exception e) {
+            LOG.info("hasConstructorWithFields   no constructor with args " + constructorArgTypes);
+            return false;
+        }
+        return true;
     }
 }

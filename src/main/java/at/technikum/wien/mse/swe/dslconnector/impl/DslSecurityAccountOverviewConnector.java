@@ -1,7 +1,7 @@
 package at.technikum.wien.mse.swe.dslconnector.impl;
 
 import at.technikum.wien.mse.swe.SecurityAccountOverviewConnector;
-import at.technikum.wien.mse.swe.dslconnector.Parser;
+import at.technikum.wien.mse.swe.dslconnector.GenericMapper;
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
 import at.technikum.wien.mse.swe.exception.SecurityAccountOverviewReadException;
 import at.technikum.wien.mse.swe.model.SecurityAccountOverview;
@@ -25,16 +25,15 @@ public class DslSecurityAccountOverviewConnector implements SecurityAccountOverv
             throw new SecurityAccountOverviewReadException(e);
         }
 
-        final Parser parser = new Parser();
+        final GenericMapper genericMapper = new GenericMapper();
 
         try {
-            final SecurityAccountOverview securityAccountOverview = parser.parse(content, SecurityAccountOverview.class);
+            final SecurityAccountOverview securityAccountOverview = genericMapper.map(content, SecurityAccountOverview.class);
             return securityAccountOverview;
         } catch (FieldParserException e) {
             LOG.error("Error parsing the string '" + content + "'   exception: " + e.getMessage());
         }
 
         return null;
-
     }
 }
