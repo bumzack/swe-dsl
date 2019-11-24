@@ -12,7 +12,7 @@ public class SecurityConfiguration {
             padding = {false}, paddingCharacter = {' '})
     private ISIN isin;
 
-    @ComplexElement(name = {"code"}, position = {52}, length = {2}, align = {AlignmentEnum.LEFT}, padding = {false}, paddingCharacter = {' '})
+    @SimpleElement(position = 52, length = 2, align = AlignmentEnum.LEFT, padding = false, paddingCharacter = ' ')
     private RiskCategory riskCategory;
 
     @SimpleElement(position = 54, length = 30, align = AlignmentEnum.RIGHT)
@@ -66,7 +66,6 @@ public class SecurityConfiguration {
     public void setYearLowest(Amount yearLowest) {
         this.yearLowest = yearLowest;
     }
-
 
     @Override
     public String toString() {

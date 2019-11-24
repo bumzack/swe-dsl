@@ -1,18 +1,18 @@
-package at.technikum.wien.mse.swe.dslconnector.parser;
+package at.technikum.wien.mse.swe.dslconnector.mapper;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.AlignmentEnum;
-import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
-import at.technikum.wien.mse.swe.dslconnector.parser.dto.SimpleTypeDto;
+import at.technikum.wien.mse.swe.dslconnector.exception.FieldMapperException;
+import at.technikum.wien.mse.swe.dslconnector.mapper.dto.SimpleTypeDto;
 import org.apache.commons.lang.StringUtils;
 
-public abstract class AbstractFieldParser implements FieldParser {
+public abstract class AbstractFieldMapper implements FieldMapper {
 
     protected SimpleTypeDto simpleTypeDto;
 
     @Override
-    public abstract <T> T parseValue(final String source) throws FieldParserException;
+    public abstract <T> T mapValue(final String source) throws FieldMapperException;
 
-    protected String parse(final String source) {
+    protected String map(final String source) {
         final String paddingString = String.valueOf(simpleTypeDto.getPaddingCharacter());
         final String fieldString = source.substring(simpleTypeDto.getPos(), simpleTypeDto.getPos() + simpleTypeDto.getLen());
         String fieldStringTrimmed = fieldString;

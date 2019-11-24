@@ -13,10 +13,10 @@ import java.math.BigDecimal;
 
 public class PersonConstructor {
 
-    @SimpleElement(position = 0, length = 10, align = AlignmentEnum.LEFT, paddingCharacter = ' ')
+    @SimpleElement(position = 0, length = 5, align = AlignmentEnum.LEFT, paddingCharacter = ' ')
     private String firstName;
 
-    @SimpleElement(position = 10, length = 10, align = AlignmentEnum.LEFT, paddingCharacter = ' ')
+    @SimpleElement(position = 5, length = 5, align = AlignmentEnum.LEFT, paddingCharacter = ' ')
     private String lastName;
 
     @SimpleElement(position = 10, length = 5, align = AlignmentEnum.LEFT, paddingCharacter = ' ')

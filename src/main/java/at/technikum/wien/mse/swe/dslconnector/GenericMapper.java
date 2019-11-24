@@ -2,11 +2,11 @@ package at.technikum.wien.mse.swe.dslconnector;
 
 import at.technikum.wien.mse.swe.dslconnector.annotations.ComplexElement;
 import at.technikum.wien.mse.swe.dslconnector.annotations.SimpleElement;
-import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
-import at.technikum.wien.mse.swe.dslconnector.parser.FieldParser;
-import at.technikum.wien.mse.swe.dslconnector.parser.ParserFactory;
-import at.technikum.wien.mse.swe.model.RiskCategory;
-import org.apache.commons.lang.StringUtils;
+import at.technikum.wien.mse.swe.dslconnector.exception.FieldMapperException;
+import at.technikum.wien.mse.swe.dslconnector.mapper.FieldMapper;
+import at.technikum.wien.mse.swe.dslconnector.mapper.dto.SimpleTypeDto;
+import at.technikum.wien.mse.swe.dslconnector.mapper.impl.ComplexTypeMapper;
+import at.technikum.wien.mse.swe.dslconnector.mapper.impl.SimpleTypeMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,56 +33,53 @@ public class GenericMapper {
         init();
     }
 
-    public <T> T map(final String source, final Class<T> c) throws FieldParserException {
+    static public FieldMapper getMapperByAnnotation(final Field field, final Annotation a) {
+        if (a instanceof SimpleElement) {
+            final SimpleElement element = (SimpleElement) a;
+            final SimpleTypeDto simpleTypeDto = SimpleTypeDto.map(element);
+            return new SimpleTypeMapper(field, simpleTypeDto);
+        }
+
+        if (a instanceof ComplexElement) {
+            final ComplexElement element = (ComplexElement) a;
+            return new ComplexTypeMapper(field, element);
+        }
+        return null;
+    }
+
+    public <T> T map(final String source, final Class<T> c) throws FieldMapperException {
         final List<Field> annotatedFields = getAnnotatedFields(c);
-        // annotatedFields.forEach(af -> System.out.println("\t\t   field " + af));
-        final Map<Field, FieldParser> fieldParsers = getFieldParsersByAnnotation(annotatedFields);
+        final Map<Field, FieldMapper> fieldMapper = getFieldMapperByAnnotation(annotatedFields);
 
-        return mapToObject(source, c, annotatedFields, fieldParsers);
+        return mapToObject(source, c, annotatedFields, fieldMapper);
     }
 
-    public <T> T mapComplexTypeToObject(final String source, final Class<T> c, final List<Field> fields, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
-        // fields.forEach(af -> System.out.println("\t\t   field " + af));
-        return mapToObject(source, c, fields, fieldParsers);
+    public <T> T mapComplexTypeToObject(final String source, final Class<T> c, final List<Field> fields, final Map<Field, FieldMapper> fieldMapper) throws FieldMapperException {
+        return mapToObject(source, c, fields, fieldMapper);
     }
 
-    private <T> T mapToObject(final String source, final Class<T> c, final List<Field> fields, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
-        /// fields.forEach(af -> System.out.println("\t\t   field " + af.getName() + " type: " + af.getType()));
+    private <T> T mapToObject(final String source, final Class<T> c, final List<Field> fields, final Map<Field, FieldMapper> fieldMapper) throws FieldMapperException {
 
         final T obj;
-        if (c.isEnum()) {
-            obj = getEnum(source, c, fieldParsers);
+        if (hasConstructorWithFields(c, fields)) {
+            obj = createAndPopulateWithConstructor(c, source, fieldMapper);
         } else {
-            if (hasConstructorWithFields(c, fields)) {
-                obj = createAndPopulateWithConstructor(c, source, fieldParsers);
-            } else {
-                obj = createByEmptyConstructor(c);
-                populateObject(source, fieldParsers, obj);
-            }
+            obj = createByEmptyConstructor(c);
+            populateObject(source, fieldMapper, obj);
         }
         return obj;
     }
 
-    private <T> T getEnum(final String source, final Class<T> c, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
-        LOG.trace("got an enum - this is soooo sad");
-
-        if (fieldParsers.keySet().size() != 1) {
-            LOG.error("error creating obj of type " + c.getSimpleName() + " cant create an enum with more than 1 or less than field. ");
-            throw new FieldParserException("error creating obj of type " + c.getSimpleName() + " cant create an enum with more than 1 or less than field. ");
+    private <T> T getEnum(final String source, final Class<T> c, final Map<Field, FieldMapper> fieldMapper) throws FieldMapperException {
+        if (fieldMapper.keySet().size() != 1) {
+            LOG.error("error creating obj of type " + c.getSimpleName() + " cant create an enum with more than 1 or less than 1 field. ");
+            throw new FieldMapperException("error creating obj of type " + c.getSimpleName() + " cant create an enum with more than 1 or less than field. ");
         }
-
-        final FieldParser fp = fieldParsers.values().stream().findFirst().get();
-        final String enumValue = fp.parseValue(source);
-
-        if (StringUtils.isEmpty(enumValue)) {
-            return null;
-        }
-        return (T) RiskCategory.fromCode(enumValue).orElseThrow(() -> new FieldParserException("can't read enum at field with position "));
+        return ReflectionHelper.getEnum(source, c);
     }
 
-    private <T> T createAndPopulateWithConstructor(final Class<T> c, final String source, final Map<Field, FieldParser> fieldParsers) throws FieldParserException {
-        // create an array with the types the constructor must provide
-        final List<Class> constructorArgTypes = fieldParsers.keySet().stream()
+    private <T> T createAndPopulateWithConstructor(final Class<T> c, final String source, final Map<Field, FieldMapper> fieldMapper) throws FieldMapperException {
+        final List<Class> constructorArgTypes = fieldMapper.keySet().stream()
                 .map(Field::getType)
                 .collect(toList());
 
@@ -93,15 +90,15 @@ public class GenericMapper {
         try {
             cons = c.getConstructor(cl);
         } catch (Exception e) {
-            throw new FieldParserException("no constructor found for argument types " + constructorArgTypes);
+            throw new FieldMapperException("no constructor found for argument types " + constructorArgTypes);
         }
 
-        final Object[] args = fieldParsers.values().stream()
-                .map(parser -> {
+        final Object[] args = fieldMapper.values().stream()
+                .map(mapper -> {
                     try {
-                        return parser.parseValue(source);
-                    } catch (FieldParserException e) {
-                        LOG.error("exception in parseValue: " + e.getMessage());
+                        return mapper.mapValue(source);
+                    } catch (FieldMapperException e) {
+                        LOG.error("exception in mapValue: " + e.getMessage());
                     }
                     return null;
                 })
@@ -112,45 +109,32 @@ public class GenericMapper {
         try {
             obj = (T) cons.newInstance(args);
         } catch (Exception e) {
-            throw new FieldParserException("error creating obj of type " + c.getSimpleName() + " using constructor types: " + constructorArgTypes + " and param values " + args);
+            throw new FieldMapperException("error creating obj of type " + c.getSimpleName() + " using constructor types: " + constructorArgTypes + " and param values " + args);
         }
 
         return obj;
     }
 
-    private <T> void populateObject(final String source, final Map<Field, FieldParser> fieldParsers, final T obj) {
-        fieldParsers.forEach((field, parser) -> {
+    private <T> void populateObject(final String source, final Map<Field, FieldMapper> fieldMapper, final T obj) {
+        fieldMapper.forEach((field, mapper) -> {
             try {
-                setFieldValue(obj, field, parser.parseValue(source));
-            } catch (FieldParserException e) {
+                setFieldValue(obj, field, mapper.mapValue(source));
+            } catch (FieldMapperException e) {
                 LOG.error("error populateObject  call to 'setFieldValue'      " + e.getMessage());
             }
         });
     }
 
-    private Map<Field, FieldParser> getFieldParsersByAnnotation(final List<Field> fields) {
-        final Map<Field, FieldParser> fieldParsers = new LinkedHashMap<>();
+    private Map<Field, FieldMapper> getFieldMapperByAnnotation(final List<Field> fields) {
+        final Map<Field, FieldMapper> fieldMapper = new LinkedHashMap<>();
         fields.forEach(f -> {
             try {
-                fieldParsers.put(f, getParserByAnnotation(f));
-            } catch (FieldParserException e) {
-                LOG.error("error getFieldParsers call to 'getParser': " + e.getMessage());
+                fieldMapper.put(f, getMapperByAnnotation(f));
+            } catch (FieldMapperException e) {
+                LOG.error("error getFieldMappers call to 'getMapperByAnnotation': " + e.getMessage());
             }
         });
-        return fieldParsers;
-    }
-
-    private FieldParser getParserByAnnotation(final Field f) throws FieldParserException {
-        final List<Annotation> annotations = Arrays.asList(f.getAnnotations());
-        if (annotations.size() != 1) {
-            throw new FieldParserException("found " + annotations.size() + " annotations, but can only handle 1 for each field");
-        }
-
-        final FieldParser parser = annotations.stream()
-                .map(a -> ParserFactory.getParserByAnnotation(f.getType(), a))
-                .findFirst()
-                .orElseThrow(() -> new FieldParserException("No Parser found for field '" + f.getName() + " annotation: " + annotations.get(0).annotationType().getSimpleName()));
-        return parser;
+        return fieldMapper;
     }
 
     private <T> List<Field> getAnnotatedFields(final Class<T> c) {
@@ -165,5 +149,18 @@ public class GenericMapper {
         final boolean res = annotations.stream()
                 .anyMatch(a -> supportedAnnotations.contains(a.annotationType().getSimpleName()));
         return res;
+    }
+
+    private FieldMapper getMapperByAnnotation(final Field f) throws FieldMapperException {
+        final List<Annotation> annotations = Arrays.asList(f.getAnnotations());
+        if (annotations.size() != 1) {
+            throw new FieldMapperException("found " + annotations.size() + " annotations, but can only handle 1 for each field");
+        }
+
+        final FieldMapper mapper = annotations.stream()
+                .map(a -> getMapperByAnnotation(f, a))
+                .findFirst()
+                .orElseThrow(() -> new FieldMapperException("No mapper found for field '" + f.getName() + " annotation: " + annotations.get(0).annotationType().getSimpleName()));
+        return mapper;
     }
 }

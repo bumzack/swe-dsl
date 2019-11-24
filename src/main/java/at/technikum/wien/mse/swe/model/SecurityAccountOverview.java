@@ -13,7 +13,7 @@ public class SecurityAccountOverview {
     @SimpleElement(position = 40, length = 10, align = AlignmentEnum.RIGHT, paddingCharacter = '0')
     private String accountNumber;
 
-    @ComplexElement(name = {"code"}, position = {50}, length = {2}, align = {AlignmentEnum.LEFT}, padding = {false}, paddingCharacter = {' '})
+    @SimpleElement(position = 50, length = 2, align = AlignmentEnum.LEFT, padding = false, paddingCharacter = ' ')
     private RiskCategory riskCategory;
 
     @ComplexElement(name = {"lastname", "firstname"}, position = {52, 82}, length = {30, 30}, align = {AlignmentEnum.RIGHT, AlignmentEnum.RIGHT},

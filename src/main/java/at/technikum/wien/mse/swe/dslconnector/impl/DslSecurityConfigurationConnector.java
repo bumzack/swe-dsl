@@ -2,7 +2,7 @@ package at.technikum.wien.mse.swe.dslconnector.impl;
 
 import at.technikum.wien.mse.swe.SecurityConfigurationConnector;
 import at.technikum.wien.mse.swe.dslconnector.GenericMapper;
-import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
+import at.technikum.wien.mse.swe.dslconnector.exception.FieldMapperException;
 import at.technikum.wien.mse.swe.exception.SecurityAccountOverviewReadException;
 import at.technikum.wien.mse.swe.model.SecurityConfiguration;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +30,7 @@ public class DslSecurityConfigurationConnector implements SecurityConfigurationC
         try {
             final SecurityConfiguration securityConfiguration = genericMapper.map(content, SecurityConfiguration.class);
             return securityConfiguration;
-        } catch (FieldParserException e) {
+        } catch (FieldMapperException e) {
             LOG.error("Error parsing the string '" + content + "'     exception: " + e.getMessage());
         }
 

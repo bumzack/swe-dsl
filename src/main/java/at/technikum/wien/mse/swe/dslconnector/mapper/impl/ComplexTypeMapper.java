@@ -1,23 +1,22 @@
-package at.technikum.wien.mse.swe.dslconnector.parser.impl;
+package at.technikum.wien.mse.swe.dslconnector.mapper.impl;
 
 import at.technikum.wien.mse.swe.dslconnector.GenericMapper;
 import at.technikum.wien.mse.swe.dslconnector.annotations.ComplexElement;
-import at.technikum.wien.mse.swe.dslconnector.exception.FieldParserException;
-import at.technikum.wien.mse.swe.dslconnector.parser.FieldParser;
-import at.technikum.wien.mse.swe.dslconnector.parser.dto.ComplexTypeDto;
-import at.technikum.wien.mse.swe.dslconnector.parser.dto.SimpleTypeDto;
+import at.technikum.wien.mse.swe.dslconnector.exception.FieldMapperException;
+import at.technikum.wien.mse.swe.dslconnector.mapper.FieldMapper;
+import at.technikum.wien.mse.swe.dslconnector.mapper.dto.ComplexTypeDto;
+import at.technikum.wien.mse.swe.dslconnector.mapper.dto.SimpleTypeDto;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ComplexTypeParser implements FieldParser {
+public class ComplexTypeMapper implements FieldMapper {
     private Map<String, ComplexTypeDto> complexTypeDtos;
-    private Type t;
+    private Field field;
 
-    public ComplexTypeParser(final Type t, final ComplexElement complexElement) {
-        this.t = t;
+    public ComplexTypeMapper(final Field f, final ComplexElement complexElement) {
+        this.field = f;
 
         complexTypeDtos = new LinkedHashMap<>();
 
@@ -32,17 +31,11 @@ public class ComplexTypeParser implements FieldParser {
         }
     }
 
-    public <T> T parseValue(final String source) throws FieldParserException {
+    public <T> T mapValue(final String source) throws FieldMapperException {
 
         // \_(ツ)_/¯
-        final Map<String, Field> availableFields = Arrays.asList(((Class) t).getDeclaredFields()).stream()
+        final Map<String, Field> availableFields = Arrays.asList(((Class) field.getType()).getDeclaredFields()).stream()
                 .collect(Collectors.toMap(Field::getName, entry -> entry));
-
-        /// System.out.println("ComplexTypeParser   avaliable fields");
-        // availableFields.keySet().forEach(k -> System.out.println("      name: " + k));
-
-        // System.out.println("ComplexTypeParser   complexTypeDtos fields");
-        //  complexTypeDtos.keySet().forEach(k -> System.out.println("      name: " + k));
 
         final boolean allPresent = complexTypeDtos.keySet().stream()
                 .anyMatch(availableFields::containsKey);
@@ -50,9 +43,9 @@ public class ComplexTypeParser implements FieldParser {
         if (!allPresent) {
             final String err = "at least one of the required fields in the list of ComplexTYpe names is not available in the class " +
                     "fields in Annotation: " + complexTypeDtos.keySet().stream().toString() +
-                    "available field in class " + ((Class) t).getSimpleName() + ": " +
+                    "available field in class " + ((Class) field.getType()).getSimpleName() + ": " +
                     availableFields.keySet().stream().toString();
-            throw new FieldParserException(err);
+            throw new FieldMapperException(err);
         }
 
         // order of fields is relevant for constructor in case
@@ -62,15 +55,15 @@ public class ComplexTypeParser implements FieldParser {
                 .collect(Collectors.toList());
 
         final GenericMapper genericMapper = new GenericMapper();
-        final Map<Field, FieldParser> fieldParsers = complexTypeDtos.entrySet().stream()
+        final Map<Field, FieldMapper> fieldMappers = complexTypeDtos.entrySet().stream()
                 .map(entry -> {
                     final Field f = availableFields.get(entry.getKey());
                     final SimpleTypeDto simpleTypeDto = SimpleTypeDto.map(entry.getValue());
-                    final FieldParser fieldParser = new SimpleTypeParser(f.getType(), simpleTypeDto);
-                    return new AbstractMap.SimpleEntry<>(f, fieldParser);
+                    final FieldMapper fieldMapper = new SimpleTypeMapper(f, simpleTypeDto);
+                    return new AbstractMap.SimpleEntry<>(f, fieldMapper);
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return (T) genericMapper.mapComplexTypeToObject(source, (Class) t, fields, fieldParsers);
+        return (T) genericMapper.mapComplexTypeToObject(source, (Class) field.getType(), fields, fieldMappers);
     }
 }
