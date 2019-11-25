@@ -1,22 +1,13 @@
 package at.technikum.wien.mse.swe.dslconnector;
 
 import at.technikum.wien.mse.swe.dslconnector.exception.FieldMapperException;
-import at.technikum.wien.mse.swe.dslconnector.impl.DslSecurityAccountOverviewConnector;
-import at.technikum.wien.mse.swe.dslconnector.impl.DslSecurityConfigurationConnector;
 import at.technikum.wien.mse.swe.dslconnector.model.PersonConstructor;
 import at.technikum.wien.mse.swe.dslconnector.model.PersonSetter;
 import at.technikum.wien.mse.swe.dslconnector.model.PersonWithEnumAndIntegerAndLong;
-import at.technikum.wien.mse.swe.exception.SecurityAccountOverviewReadException;
-import at.technikum.wien.mse.swe.model.SecurityAccountOverview;
-import at.technikum.wien.mse.swe.model.SecurityConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class Main {
     private static final Logger LOG = LogManager.getLogger(Main.class);
@@ -27,8 +18,6 @@ public class Main {
     public static void main(String[] args) throws FieldMapperException, URISyntaxException {
         testEnum();
         testPerson();
-        testOverview();
-        testConfiguration();
     }
 
     private static void testEnum() throws FieldMapperException {
@@ -75,54 +64,6 @@ public class Main {
         LOG.trace("");
         LOG.trace("-----------   object PersonConstructor   -----------------------------------------------------------------------------------------------------");
         LOG.trace(personConstructor);
-        LOG.trace("----------------------------------------------------------------------------------------------------------------");
-    }
-
-    private static void testOverview() throws URISyntaxException {
-        final DslSecurityAccountOverviewConnector p = new DslSecurityAccountOverviewConnector();
-
-        String content = "";
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(ClassLoader.getSystemResource(FILENAME).toURI()))) {
-            content = reader.readLine();
-        } catch (IOException e) {
-            throw new SecurityAccountOverviewReadException(e);
-        }
-
-        SecurityAccountOverview overview = p.read(Paths.get(ClassLoader.getSystemResource(FILENAME).toURI()));
-        LOG.trace("");
-        LOG.trace("");
-        LOG.trace("--------  read line ----------------------------------------------------------------------------------------------------------------");
-        LOG.trace(content);
-        LOG.trace("----------------------------------------------------------------------------------------------------------------");
-
-        LOG.trace("");
-        LOG.trace("");
-        LOG.trace("----------- object SecurityAccountOverview  -----------------------------------------------------------------------------------------------------");
-        LOG.trace(overview);
-        LOG.trace("----------------------------------------------------------------------------------------------------------------");
-    }
-
-    private static void testConfiguration() throws URISyntaxException {
-        final DslSecurityConfigurationConnector p = new DslSecurityConfigurationConnector();
-
-        String content = "";
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(ClassLoader.getSystemResource(FILENAME_CONFIGURATION).toURI()))) {
-            content = reader.readLine();
-        } catch (IOException e) {
-            throw new SecurityAccountOverviewReadException(e);
-        }
-
-        SecurityConfiguration configuration = p.read(Paths.get(ClassLoader.getSystemResource(FILENAME_CONFIGURATION).toURI()));
-        LOG.trace("");
-        LOG.trace("");
-        LOG.trace("-------    read line   ----------------------------------------------------------------------------------------------------------------");
-        LOG.trace(content);
-        LOG.trace("----------------------------------------------------------------------------------------------------------------");
-
-        LOG.trace("");
-        LOG.trace("");
-        LOG.trace("---------- object SecurityConfiguration  ------------------------------------------------------------------------------------------------------");
-        LOG.trace(configuration);
         LOG.trace("----------------------------------------------------------------------------------------------------------------");
     }
 }

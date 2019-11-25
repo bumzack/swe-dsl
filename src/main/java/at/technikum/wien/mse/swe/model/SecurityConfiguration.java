@@ -66,14 +66,4 @@ public class SecurityConfiguration {
     public void setYearLowest(Amount yearLowest) {
         this.yearLowest = yearLowest;
     }
-
-    @Override
-    public String toString() {
-        return "SecurityConfiguration{" +
-                "isin='" + isin + '\'' +
-                ", riskCategory=" + riskCategory +
-                ", name=" + name +
-                ", yearHighest=" + yearHighest +
-                ", yearLowest=" + yearLowest + '}';
-    }
 }

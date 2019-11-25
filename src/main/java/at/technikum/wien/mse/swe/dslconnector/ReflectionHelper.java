@@ -49,9 +49,7 @@ public class ReflectionHelper {
         final String setter = StringUtils.join(new String[]{"set", StringUtils.capitalize(field.getName())});
 
         try {
-            Class tmp = o.getClass();
-
-            final Method setterMethod = getSetterMethod(tmp, setter);
+            final Method setterMethod = getSetterMethod(o.getClass(), setter);
             if (setterMethod == null) {
                 throw new FieldMapperException(String.format("no setter method found for field " + field.getName()));
             }
@@ -92,11 +90,10 @@ public class ReflectionHelper {
 
     // no constructor required/allowed with enum
     // just call valueOf or any other method that returns an enum ...
-    public static <T> T getEnum(final String source, final Class<T> c) throws FieldMapperException {
+    public static <T> T getEnum(final String source, final Class<T> c) {
         final List<Method> stringMethods = ReflectionHelper.getMethodsWithStringParameter(c);
         for (Method m : stringMethods) {
             try {
-                //  \_(ツ)_/¯: passing null for the obj :-(
                 final Object obj = m.invoke(null, source);
                 // RiskCategory returns an Optional<RiskCategory>
                 // unpack the RiskCategory
@@ -111,6 +108,7 @@ public class ReflectionHelper {
                 LOG.info("setter method " + m.getName() + " failed to set value" + e.getMessage());
             }
         }
+        LOG.error("no setter method found which returns a valid object");
         return null;
     }
 
@@ -146,25 +144,4 @@ public class ReflectionHelper {
                 .filter(m -> StringUtils.equalsIgnoreCase(m.getName(), "valueOf"))
                 .collect(Collectors.toList());
     }
-
-//
-
-//    static private <T> boolean hasConstructorFromString(final Class<T> c, final List<Field> fields) {
-//        final List<Class> constructorArgTypes = fields.stream()
-//                .map(Field::getType)
-//                .collect(toList());
-//
-//        // \_(ツ)_/¯
-//        Class[] cl = constructorArgTypes.toArray(new Class[0]);
-//        Constructor<?> cons = null;
-//
-//        try {
-//            cons = c.getConstructor(cl);
-//        } catch (Exception e) {
-//            LOG.info("hasConstructorWithFields   no constructor with args " + constructorArgTypes);
-//            return false;
-//        }
-//        return true;
-//    }
-
 }

@@ -26,6 +26,4 @@ public class DslSecurityAccountOverviewConnector implements SecurityAccountOverv
 
         return null;
     }
-
-
 }

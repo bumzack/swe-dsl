@@ -10,7 +10,6 @@ public class ComplexTypeDto {
     private boolean padding;
     private char paddingCharacter;
 
-
     public ComplexTypeDto(String name, int pos, int len, AlignmentEnum alignment, boolean padding, char paddingCharacter) {
         this.name = name;
         this.pos = pos;

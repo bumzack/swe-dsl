@@ -5,7 +5,6 @@ package at.technikum.wien.mse.swe.model;
  */
 public class DepotOwner {
 
-
     private String firstname;
     private String lastname;
 
@@ -23,10 +22,5 @@ public class DepotOwner {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
-    }
-
-    @Override
-    public String toString() {
-        return "[ DepotOwner:  fn: '" + firstname + "', ln: '" + lastname + "' ]";
     }
 }

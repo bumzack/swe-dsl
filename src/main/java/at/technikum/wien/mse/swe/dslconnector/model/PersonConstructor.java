@@ -8,7 +8,7 @@ import at.technikum.wien.mse.swe.model.Amount;
 import java.math.BigDecimal;
 
 /**
- * @author MatthiasKreuzriegler
+ * @author gs
  */
 
 public class PersonConstructor {

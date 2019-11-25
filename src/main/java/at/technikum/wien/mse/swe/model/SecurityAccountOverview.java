@@ -55,14 +55,4 @@ public class SecurityAccountOverview {
     public void setBalance(Amount balance) {
         this.balance = balance;
     }
-
-    @Override
-    public String toString() {
-        return "SecurityAccountOverview{" +
-                "accountNumber='" + accountNumber + '\'' +
-                ", riskCategory=" + riskCategory +
-                ", depotOwner=" + depotOwner +
-                ", balance=" + balance +
-                '}';
-    }
 }
