@@ -12,9 +12,6 @@ import java.net.URISyntaxException;
 public class Main {
     private static final Logger LOG = LogManager.getLogger(Main.class);
 
-    private static final String FILENAME = "examples/SecurityAccountOverview_0123456789.txt";
-    private static final String FILENAME_CONFIGURATION = "examples/SecurityConfiguration_AT0000937503.txt";
-
     public static void main(String[] args) throws FieldMapperException, URISyntaxException {
         testEnum();
         testPerson();
