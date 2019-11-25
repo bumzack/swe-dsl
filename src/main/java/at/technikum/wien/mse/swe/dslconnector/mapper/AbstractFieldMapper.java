@@ -12,7 +12,7 @@ public abstract class AbstractFieldMapper implements FieldMapper {
     @Override
     public abstract <T> T mapValue(final String source) throws FieldMapperException;
 
-    protected String map(final String source) {
+    protected String parseString(final String source) {
         final String paddingString = String.valueOf(simpleTypeDto.getPaddingCharacter());
         final String fieldString = source.substring(simpleTypeDto.getPos(), simpleTypeDto.getPos() + simpleTypeDto.getLen());
         String fieldStringTrimmed = fieldString;

@@ -33,20 +33,6 @@ public class GenericMapper {
         init();
     }
 
-    static public FieldMapper getMapperByAnnotation(final Field field, final Annotation a) {
-        if (a instanceof SimpleElement) {
-            final SimpleElement element = (SimpleElement) a;
-            final SimpleTypeDto simpleTypeDto = SimpleTypeDto.map(element);
-            return new SimpleTypeMapper(field, simpleTypeDto);
-        }
-
-        if (a instanceof ComplexElement) {
-            final ComplexElement element = (ComplexElement) a;
-            return new ComplexTypeMapper(field, element);
-        }
-        return null;
-    }
-
     public <T> T map(final String source, final Class<T> c) throws FieldMapperException {
         final List<Field> annotatedFields = getAnnotatedFields(c);
         final Map<Field, FieldMapper> fieldMapper = getFieldMapperByAnnotation(annotatedFields);
@@ -162,5 +148,19 @@ public class GenericMapper {
                 .findFirst()
                 .orElseThrow(() -> new FieldMapperException("No mapper found for field '" + f.getName() + " annotation: " + annotations.get(0).annotationType().getSimpleName()));
         return mapper;
+    }
+
+    static public FieldMapper getMapperByAnnotation(final Field field, final Annotation a) {
+        if (a instanceof SimpleElement) {
+            final SimpleElement element = (SimpleElement) a;
+            final SimpleTypeDto simpleTypeDto = SimpleTypeDto.map(element);
+            return new SimpleTypeMapper(field, simpleTypeDto);
+        }
+
+        if (a instanceof ComplexElement) {
+            final ComplexElement element = (ComplexElement) a;
+            return new ComplexTypeMapper(field, element);
+        }
+        return null;
     }
 }

@@ -19,10 +19,6 @@ public class SimpleTypeDto {
         this.paddingCharacter = paddingCharacter;
     }
 
-    static public SimpleTypeDto map(int pos, int len, AlignmentEnum alignment, boolean padding, char paddingCharacter) {
-        return new SimpleTypeDto(pos, len, alignment, padding, paddingCharacter);
-    }
-
     static public SimpleTypeDto map(final ComplexTypeDto complexTypeDto) {
         return new SimpleTypeDto(complexTypeDto.getPos(), complexTypeDto.getLen(), complexTypeDto.getAlignment(), complexTypeDto.isPadding(), complexTypeDto.getPaddingCharacter());
     }

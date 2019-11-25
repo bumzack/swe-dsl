@@ -21,7 +21,7 @@ public class SimpleTypeMapper extends AbstractFieldMapper {
     }
 
     public <T> T mapValue(final String source) throws FieldMapperException {
-        final String parsed = map(source);
+        final String parsed = parseString(source);
         if (field.getType().getTypeName().equals(String.class.getTypeName())) {
             return (T) parsed;
         } else if (field.getType().isEnum()) {

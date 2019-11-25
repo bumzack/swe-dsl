@@ -34,7 +34,7 @@ public class ComplexTypeMapper implements FieldMapper {
     public <T> T mapValue(final String source) throws FieldMapperException {
 
         // \_(ツ)_/¯
-        final Map<String, Field> availableFields = Arrays.asList(((Class) field.getType()).getDeclaredFields()).stream()
+        final Map<String, Field> availableFields = Arrays.stream(field.getType().getDeclaredFields())
                 .collect(Collectors.toMap(Field::getName, entry -> entry));
 
         final boolean allPresent = complexTypeDtos.keySet().stream()
@@ -48,7 +48,7 @@ public class ComplexTypeMapper implements FieldMapper {
             throw new FieldMapperException(err);
         }
 
-        // order of fields is relevant for constructor in case
+        // order of fields is relevant for constructor if used
         final List<Field> fields = availableFields.entrySet().stream()
                 .filter(entry -> complexTypeDtos.containsKey(entry.getKey()))
                 .map(Map.Entry::getValue)
