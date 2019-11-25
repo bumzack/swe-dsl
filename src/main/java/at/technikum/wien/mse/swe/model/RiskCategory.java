@@ -1,5 +1,8 @@
 package at.technikum.wien.mse.swe.model;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 /**
  * @author MatthiasKreuzriegler
  */
@@ -16,5 +19,9 @@ public enum RiskCategory {
 
     RiskCategory(String code) {
         this.code = code;
+    }
+
+    public static final Optional<RiskCategory> fromCode(String code) {
+        return Arrays.stream(values()).filter(rc -> rc.code.equalsIgnoreCase(code)).findFirst();
     }
 }
