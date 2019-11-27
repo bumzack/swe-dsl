@@ -22,7 +22,7 @@ public class Main {
 
         final GenericMapper p = new GenericMapper();
 
-        final PersonWithEnumAndIntegerAndLong enumTest = p.map(source, PersonWithEnumAndIntegerAndLong.class);
+        final PersonWithEnumAndIntegerAndLong person = p.map(source, PersonWithEnumAndIntegerAndLong.class);
 
         LOG.trace("");
         LOG.trace("");
@@ -32,8 +32,8 @@ public class Main {
 
         LOG.trace("");
         LOG.trace("");
-        LOG.trace("----------object EnumTest   ------------------------------------------------------------------------------------------------------");
-        LOG.trace(enumTest);
+        LOG.trace("----------object person   ------------------------------------------------------------------------------------------------------");
+        LOG.trace(person);
         LOG.trace("----------------------------------------------------------------------------------------------------------------");
     }
 
